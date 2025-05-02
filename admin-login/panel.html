@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: white;
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+    }
+    label {
+      margin-top: 1rem;
+      display: block;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 0.5rem;
+      background-color: #2a2a2a;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      margin-top: 0.5rem;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      background-color: #00bfff;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .success {
+      color: lightgreen;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h2>Set Daily Shoutout</h2>
+
+  <label>Name:</label>
+  <input type="text" id="shoutout-name" />
+
+  <label>Message:</label>
+  <textarea id="shoutout-message" rows="4"></textarea>
+
+  <button onclick="saveShoutout()">Save</button>
+  <div class="success" id="success-msg"></div>
+
+  <script>
+    function saveShoutout() {
+      const name = document.getElementById('shoutout-name').value;
+      const message = document.getElementById('shoutout-message').value;
+
+      localStorage.setItem('shoutoutName', name);
+      localStorage.setItem('shoutoutMessage', message);
+
+      document.getElementById('success-msg').textContent = 'Shoutout saved!';
+    }
+  </script>
+</body>
+</html>
