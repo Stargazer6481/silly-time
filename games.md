@@ -5776,18 +5776,3 @@ This page contains a collection of browser games that you can play. Each game li
 ```html
  <iframe width="1366" height="768" src="https://hfmanor.com/javascript-snake" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe> 
 ```
-
----
-
-### PolyTrack
-
-<img src="https://static-cdn.jtvnw.net/ttv-boxart/Polytrack-285x380.jpg" alt="PolyTrack" width="256" height="256">
-
-- **Name:** `PolyTrack`
-- **URL:** `https://poki.com/en/g/polytrack`
-- **Image URL:** `https://static-cdn.jtvnw.net/ttv-boxart/Polytrack-285x380.jpg`
-
-**Embed Code:**
-```html
-<iframe width="100%" height="100%" src="https://hfmanor.com/javascript-snake" title="PolyTrack Game" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-```

@@ -2693,13 +2693,6 @@
 	  "game_image_icon": "https://hfmanor.com/image/route-digger",
 	  "game-id": "route-digger",
 	  "iframe": " <iframe width=\"1366\" height=\"768\" src=\"https://hfmanor.com/route-digger\" title=\"YouTube video player\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe> "
-	},
-	{
-		"name": "PolyTrack",
-		"game_url": "https://poki.com/en/g/polytrack",
-		"game_image_icon": "https://static-cdn.jtvnw.net/ttv-boxart/Polytrack-285x380.jpg",
-		"game-id": "polytrack",
-		"iframe": "<iframe width=\"1366\" height=\"768\" src=\"https://poki.com/en/g/polytrack\" title=\"PolyTrack\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>"
-	  }	  
+	}
   ]
   
