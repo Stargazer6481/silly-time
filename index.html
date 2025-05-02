@@ -80,23 +80,6 @@
       color: white;
       cursor: pointer;
     }
-
-    /* Daily shoutout styling */
-    #daily-shoutout {
-      text-align: center;
-      padding: 1rem 0;
-      background-color: #333;
-      margin-top: 1rem;
-    }
-
-    #daily-shoutout h3 {
-      margin: 0;
-    }
-
-    #daily-shoutout p {
-      margin: 0.5rem 0;
-      font-style: italic;
-    }
   </style>
 </head>
 <body>
@@ -105,16 +88,7 @@
   <input type="text" id="search" placeholder="Search games...">
 </header>
 
-<!-- Daily Shoutout Section -->
-<div id="daily-shoutout">
-  <h3>Daily Shoutout</h3>
-  <p id="shoutout-name" style="font-weight:bold;"></p>
-  <p id="shoutout-message"></p>
-</div>
-
-<main class="grid" id="game-list">
-  <!-- Placeholder for games -->
-</main>
+<main class="grid" id="game-list"></main>
 
 <div class="iframe-container" id="iframe-viewer" style="display:none;">
   <button onclick="closeIframe()">Close</button>
@@ -122,18 +96,17 @@
 </div>
 
 <script>
-  let games = [
-    {
-      name: "Sample Game",
-      game_image_icon: "https://example.com/sample-game-image.jpg",
-      iframe: `<iframe width="100%" height="100%" src="https://example.com/sample-game" title="Sample Game" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`
-    }
-  ];
-
+  let games = [];
   const gameList = document.getElementById('game-list');
   const searchInput = document.getElementById('search');
   const iframeViewer = document.getElementById('iframe-viewer');
   const iframeWrapper = document.getElementById('iframe-wrapper');
+
+  async function loadGames() {
+    const res = await fetch('games.json');
+    games = await res.json();
+    renderGames(games);
+  }
 
   function renderGames(list) {
     gameList.innerHTML = '';
@@ -167,17 +140,8 @@
     renderGames(filtered);
   });
 
-  renderGames(games);
-
-  // Load shoutout from localStorage
-  document.getElementById('shoutout-name').textContent =
-    localStorage.getItem('shoutoutName') || '—';
-  document.getElementById('shoutout-message').textContent =
-    localStorage.getItem('shoutoutMessage') || '—';
+  loadGames();
 </script>
-
-<!-- Admin Login Button -->
-<a href="admin-login.html" style="position:fixed; bottom:10px; left:10px; font-size:0.75rem; color:#aaa;">Admin Login</a>
 
 </body>
 </html>
