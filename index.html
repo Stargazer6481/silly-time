@@ -200,14 +200,10 @@
   }
 
   function toggleFullscreen() {
-    if (iframeViewer.requestFullscreen) {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
       iframeViewer.requestFullscreen();
-    } else if (iframeViewer.mozRequestFullScreen) { // Firefox
-      iframeViewer.mozRequestFullScreen();
-    } else if (iframeViewer.webkitRequestFullscreen) { // Chrome, Safari and Opera
-      iframeViewer.webkitRequestFullscreen();
-    } else if (iframeViewer.msRequestFullscreen) { // IE/Edge
-      iframeViewer.msRequestFullscreen();
     }
   }
 
