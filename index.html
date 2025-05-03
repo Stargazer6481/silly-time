@@ -22,9 +22,10 @@
     }
     .shoutout-name {
       font-weight: bold;
-      font-size: 1.5rem;
+      font-size: 2rem; /* Bigger */
     }
     .shoutout-message {
+      font-size: 1.2rem; /* Medium */
       margin-top: 0.5rem;
     }
 
@@ -121,8 +122,9 @@
 
 <!-- Shoutout Banner -->
 <div class="shoutout-banner" id="shoutout-banner">
-  <div id="shoutout-name" class="shoutout-name">Shoutout</div>
-  <div id="shoutout-message" class="shoutout-message"></div>
+  <div class="shoutout-name" id="shoutout-name">Shoutout</div>
+  <div class="shoutout-name" id="shoutout-name-value">Shoutout Name</div>
+  <div class="shoutout-message" id="shoutout-message">Shoutout message</div>
 </div>
 
 <header>
@@ -146,7 +148,7 @@
   const iframeViewer = document.getElementById('iframe-viewer');
   const iframeWrapper = document.getElementById('iframe-wrapper');
   const shoutoutBanner = document.getElementById('shoutout-banner');
-  const shoutoutName = document.getElementById('shoutout-name');
+  const shoutoutName = document.getElementById('shoutout-name-value');
   const shoutoutMessage = document.getElementById('shoutout-message');
 
   async function loadGames() {
