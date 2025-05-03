@@ -175,6 +175,61 @@
     .suggestion-btn:hover {
       background-color: #1565c0;
     }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+    }
+
+    .modal-box {
+      background: #222;
+      padding: 2rem;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .modal-box input,
+    .modal-box textarea {
+      width: 100%;
+      padding: 0.7rem;
+      background: #333;
+      border: none;
+      border-radius: 8px;
+      color: white;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+    }
+
+    .modal-buttons button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 8px;
+      background-color: #1976d2;
+      color: white;
+      cursor: pointer;
+    }
+
+    .modal-buttons button:hover {
+      background-color: #1565c0;
+    }
   </style>
 </head>
 <body>
@@ -207,6 +262,19 @@
 <a href="admin-login.html" class="admin-login-btn">Admin Login</a>
 
 <button class="suggestion-btn" onclick="openSuggestionPrompt()">Send Suggestion</button>
+
+<!-- Suggestion Modal -->
+<div id="suggestion-modal" style="display: none;" class="modal-overlay">
+  <div class="modal-box">
+    <h2>Send a Suggestion</h2>
+    <input type="text" id="suggestion-name" placeholder="Your name">
+    <textarea id="suggestion-text" placeholder="Your suggestion"></textarea>
+    <div class="modal-buttons">
+      <button onclick="submitSuggestion()">Submit</button>
+      <button onclick="closeSuggestionModal()">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <script>
   let games = [];
@@ -268,46 +336,49 @@
       shoutoutName.textContent = data.name;
       shoutoutMessage.textContent = data.message;
       shoutoutBanner.style.display = 'block';
-    } catch (err) {
-      console.error('Failed to load shoutout:', err);
+    } catch (error) {
+      console.error('Error fetching shoutout data:', error);
     }
   }
 
   function openSuggestionPrompt() {
-    const suggestion = prompt("What's your suggestion?");
-    if (suggestion) {
-      const existing = JSON.parse(localStorage.getItem('suggestions') || '[]');
-      existing.push({ text: suggestion, time: new Date().toISOString() });
-      localStorage.setItem('suggestions', JSON.stringify(existing));
-
-      fetch('https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec', {
-        method: 'POST',
-        body: JSON.stringify({ suggestion: suggestion, time: new Date().toISOString() })
-      }).then(() => alert('Thanks for your suggestion!'));
-    }
+    document.getElementById('suggestion-modal').style.display = 'flex';
   }
 
-  async function loadSuggestions() {
-    const res = await fetch('https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec');
-    const data = await res.json();
-    suggestionList.innerHTML = '';
-    data.suggestions.forEach(suggestion => {
-      const li = document.createElement('li');
-      li.textContent = suggestion.text;
-      suggestionList.appendChild(li);
+  function closeSuggestionModal() {
+    document.getElementById('suggestion-modal').style.display = 'none';
+  }
+
+  function submitSuggestion() {
+    const name = document.getElementById('suggestion-name').value.trim();
+    const suggestion = document.getElementById('suggestion-text').value.trim();
+
+    if (!name || !suggestion) {
+      alert('Please enter both your name and your suggestion.');
+      return;
+    }
+
+    const entry = { name, text: suggestion, time: new Date().toISOString() };
+
+    // Save to localStorage
+    const existing = JSON.parse(localStorage.getItem('suggestions') || '[]');
+    existing.push(entry);
+    localStorage.setItem('suggestions', JSON.stringify(existing));
+
+    // Send to Google Apps Script
+    fetch('https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec', {
+      method: 'POST',
+      body: JSON.stringify(entry)
+    }).then(() => {
+      alert('Thanks for your suggestion!');
+      closeSuggestionModal();
+      document.getElementById('suggestion-name').value = '';
+      document.getElementById('suggestion-text').value = '';
     });
   }
 
-  searchInput.addEventListener('input', () => {
-    const query = searchInput.value.toLowerCase();
-    const filtered = games.filter(game => game.name.toLowerCase().includes(query));
-    renderGames(filtered);
-  });
-
-  displayShoutout();
   loadGames();
-  loadSuggestions();
+  displayShoutout();
 </script>
-
 </body>
 </html>

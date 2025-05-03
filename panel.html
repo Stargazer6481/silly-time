@@ -96,33 +96,35 @@
 }
 
     // Function to save the shoutout to Google Sheets
-    async function saveShoutout() {
-      const name = document.getElementById('shoutout-name').value;
-      const message = document.getElementById('shoutout-message').value;
+ // Function to save the shoutout to Google Sheets
+async function saveShoutout() {
+  const name = document.getElementById('shoutout-name').value;
+  const message = document.getElementById('shoutout-message').value;
 
-      if (!name || !message) {
-        document.getElementById('shoutout-error-msg').textContent = 'Both name and message are required!';
-        return;
-      }
+  if (!name || !message) {
+    document.getElementById('shoutout-error-msg').textContent = 'Both name and message are required!';
+    return;
+  }
 
-      try {
-        const res = await fetch('https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ shoutoutName: name, shoutoutMessage: message }),
-        });
+  try {
+    const res = await fetch('https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ shoutoutName: name, shoutoutMessage: message }),
+    });
 
-        const data = await res.json();
-        document.getElementById('shoutout-success-msg').textContent = data.message || 'Shoutout saved successfully!';
-        document.getElementById('shoutout-error-msg').textContent = '';
-      } catch (error) {
-        console.error('Error saving shoutout:', error);
-        document.getElementById('shoutout-success-msg').textContent = '';
-        document.getElementById('shoutout-error-msg').textContent = 'Failed to save shoutout.';
-      }
-    }
+    const data = await res.json();
+    document.getElementById('shoutout-success-msg').textContent = data.message || 'Shoutout saved successfully!';
+    document.getElementById('shoutout-error-msg').textContent = '';
+  } catch (error) {
+    console.error('Error saving shoutout:', error);
+    document.getElementById('shoutout-success-msg').textContent = '';
+    document.getElementById('shoutout-error-msg').textContent = 'Failed to save shoutout.';
+  }
+}
+
 
     // Function to fetch all suggestions from the sheet
     async function fetchSuggestions() {
