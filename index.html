@@ -90,18 +90,6 @@
       max-height: 90%;
       border: none;
     }
-    .iframe-container button {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-      background: crimson;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      cursor: pointer;
-    }
     /* Fullscreen Button */
     .fullscreen-btn {
       position: absolute;
@@ -109,7 +97,20 @@
       right: 7rem;
       padding: 0.5rem 1rem;
       font-size: 1rem;
-      background: #007BFF;
+      background: #28a745; /* Green */
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+    }
+    /* Close Button */
+    .close-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      background: crimson; /* Red */
       border: none;
       border-radius: 8px;
       color: white;
@@ -151,7 +152,7 @@
 <main class="grid" id="game-list"></main>
 
 <div class="iframe-container" id="iframe-viewer" style="display:none;">
-  <button onclick="closeIframe()">Close</button>
+  <button class="close-btn" onclick="closeIframe()">Close</button>
   <button class="fullscreen-btn" onclick="toggleFullscreen()">Fullscreen</button>
   <div id="iframe-wrapper"></div>
 </div>
