@@ -181,10 +181,15 @@
     iframeWrapper.innerHTML = '';
   }
 
-  function displayShoutout(name, message) {
-    shoutoutName.textContent = name;
-    shoutoutMessage.textContent = message;
-    shoutoutBanner.style.display = 'block';
+  function displayShoutout() {
+    const name = localStorage.getItem('shoutoutName');
+    const message = localStorage.getItem('shoutoutMessage');
+    
+    if (name && message) {
+      shoutoutName.textContent = name;
+      shoutoutMessage.textContent = message;
+      shoutoutBanner.style.display = 'block';
+    }
   }
 
   searchInput.addEventListener('input', () => {
@@ -195,8 +200,8 @@
     renderGames(filtered);
   });
 
-  // Example shoutout, you can dynamically change it based on your needs
-  displayShoutout('Shoutout Name', 'This is the shoutout message!');
+  // Display saved shoutout on page load
+  displayShoutout();
 
   loadGames();
 </script>
