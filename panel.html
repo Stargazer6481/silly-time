@@ -107,7 +107,7 @@ async function saveShoutout() {
   }
 
   try {
-    const res = await fetch('https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec', {
+    const res = await fetch('https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec?action=setShoutoutInSheet', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
