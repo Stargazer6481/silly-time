@@ -330,16 +330,27 @@
   }
 
   async function displayShoutout() {
-    try {
-      const res = await fetch('https://raw.githubusercontent.com/stargazer6481/silly-time/main/shoutout.json');
-      const data = await res.json();
-      shoutoutName.textContent = data.name;
-      shoutoutMessage.textContent = data.message;
-      shoutoutBanner.style.display = 'block';
-    } catch (error) {
-      console.error('Error fetching shoutout data:', error);
+  try {
+    // Fetch the shoutout data from the Google Apps Script web app
+    const res = await fetch('https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec?action=getShoutout');
+    
+    // Parse the response to JSON
+    const data = await res.json();
+
+    // Check if data exists and contains both name and message
+    if (data && data.name && data.message) {
+      // Update the shoutout name and message on the page
+      document.getElementById('shoutout-name').textContent = data.name;
+      document.getElementById('shoutout-message').textContent = data.message;
+      
+      // Display the shoutout banner
+      document.getElementById('shoutout-banner').style.display = 'block';
     }
+  } catch (error) {
+    console.error('Error fetching shoutout data:', error);
   }
+}
+
 
   function openSuggestionPrompt() {
     document.getElementById('suggestion-modal').style.display = 'flex';
