@@ -2,161 +2,85 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Panel - Silly Time</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Login</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
       background-color: #121212;
       color: white;
-      margin: 0;
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
-
-    header {
-      padding: 1rem;
-      background: #1f1f1f;
+    .login-container {
+      background-color: #2a2a2a;
+      padding: 2rem;
+      border-radius: 8px;
+      width: 300px;
       text-align: center;
     }
-
-    h1 {
-      margin: 0;
+    label {
+      margin-top: 1rem;
+      display: block;
     }
-
-    #suggestion-list {
-      margin-top: 2rem;
-      list-style-type: none;
-      padding: 0;
-    }
-
-    #suggestion-list li {
-      background-color: #333;
-      padding: 1rem;
-      margin: 0.5rem 0;
-      border-radius: 8px;
-    }
-
-    .back-btn {
-      padding: 0.5rem 1rem;
-      background-color: #1976d2;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      text-decoration: none;
-      font-size: 1rem;
-      margin: 1rem;
-    }
-
-    .back-btn:hover {
-      background-color: #1565c0;
-    }
-
-    /* Shoutout Form */
-    .shoutout-form {
-      background-color: #1f1f1f;
-      padding: 2rem;
-      margin-top: 2rem;
-      border-radius: 8px;
-    }
-
-    .shoutout-form input,
-    .shoutout-form textarea {
+    input {
       width: 100%;
-      padding: 1rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 8px;
-      background: #2a2a2a;
+      padding: 0.5rem;
+      background-color: #333;
       color: white;
-      margin-bottom: 1rem;
+      border: none;
+      border-radius: 4px;
+      margin-top: 0.5rem;
     }
-
-    .shoutout-form button {
-      padding: 0.5rem 1.2rem;
-      font-size: 1rem;
-      background-color: #28a745;
-      color: white;
+    button {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      background-color: #00bfff;
       border: none;
-      border-radius: 8px;
+      border-radius: 4px;
+      color: white;
+      font-size: 1rem;
       cursor: pointer;
     }
-
-    .shoutout-form button:hover {
-      background-color: #218838;
+    .error {
+      color: red;
+      margin-top: 1rem;
     }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>Admin Panel - Silly Time</h1>
-</header>
+  <div class="login-container">
+    <h2>Admin Login</h2>
+    <label for="username">Username:</label>
+    <input type="text" id="username" />
 
-<div id="suggestion-section">
-  <h2>Suggestions</h2>
-  <ul id="suggestion-list"></ul> <!-- Suggestions will appear here -->
-</div>
+    <label for="password">Password:</label>
+    <input type="password" id="password" />
 
-<!-- Shoutout Form -->
-<div class="shoutout-form">
-  <h3>Set Daily Shoutout</h3>
-  <label for="shoutout-name">Name:</label>
-  <input type="text" id="shoutout-name" placeholder="Enter shoutout name" />
-  <label for="shoutout-message">Message:</label>
-  <textarea id="shoutout-message" placeholder="Enter shoutout message"></textarea>
-  <button onclick="setShoutout()">Save Shoutout</button>
-</div>
+    <button onclick="login()">Login</button>
+    <div class="error" id="error-msg"></div>
+  </div>
 
-<!-- Back Button -->
-<a href="index.html" class="back-btn">Back to Main Page</a>
+  <script>
+    // Replace with actual username and password
+    const adminUsername = 'admin';
+    const adminPassword = 'password123'; // Change this to your real password
 
-<script>
-  // Function to load suggestions from Google Sheets API
-  async function loadSuggestions() {
-    try {
-      const res = await fetch('https://script.google.com/macros/s/AKfycbwY3LOFYimdP1rWji4d4wGM_JqikBqPPVgyAx2Uw-4/exec');
-      const data = await res.json();
-      const suggestionList = document.getElementById('suggestion-list');
+    function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
 
-      suggestionList.innerHTML = ''; // Clear the existing list
-
-      // Add each suggestion to the list
-      data.suggestions.forEach(suggestion => {
-        const li = document.createElement('li');
-        li.textContent = suggestion.text;
-        suggestionList.appendChild(li);
-      });
-    } catch (error) {
-      console.error('Error loading suggestions:', error);
+      if (username === adminUsername && password === adminPassword) {
+        window.location.href = 'panel.html'; // Redirect to the admin panel
+      } else {
+        document.getElementById('error-msg').textContent = 'Invalid credentials. Please try again.';
+      }
     }
-  }
-
-  // Function to save shoutout message to Google Sheets API
-  async function setShoutout() {
-    const shoutoutName = document.getElementById('shoutout-name').value;
-    const shoutoutMessage = document.getElementById('shoutout-message').value;
-
-    if (!shoutoutName || !shoutoutMessage) {
-      alert("Please fill in both the name and message.");
-      return;
-    }
-
-    try {
-      await fetch('https://script.google.com/macros/s/AKfycbwY3LOFYimdP1rWji4d4wGM_JqikBqPPVgyAx2Uw-4/exec', {
-        method: 'POST',
-        body: JSON.stringify({ shoutoutName, shoutoutMessage }),
-      });
-
-      alert('Shoutout saved successfully!');
-    } catch (error) {
-      console.error('Error saving shoutout:', error);
-      alert('Failed to save shoutout.');
-    }
-  }
-
-  // Call the loadSuggestions function when the page loads
-  window.onload = loadSuggestions;
-</script>
+  </script>
 
 </body>
 </html>

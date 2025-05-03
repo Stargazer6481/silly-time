@@ -38,24 +38,72 @@
       color: lightgreen;
       margin-top: 1rem;
     }
+    .error {
+      color: red;
+      margin-top: 1rem;
+    }
+    #suggestions-list {
+      margin-top: 2rem;
+    }
+    .suggestion-item {
+      background-color: #333;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body>
-  <h2>Set Daily Shoutout</h2>
 
-  <label>Name:</label>
-  <input type="text" id="shoutout-name" />
+  <h2>Admin Panel</h2>
 
-  <label>Message:</label>
-  <textarea id="shoutout-message" rows="4"></textarea>
+  <!-- Shoutout Section -->
+  <section>
+    <h3>Set Daily Shoutout</h3>
 
-  <button onclick="saveShoutout()">Save</button>
-  <div class="success" id="success-msg"></div>
+    <label for="shoutout-name">Name:</label>
+    <input type="text" id="shoutout-name" />
+
+    <label for="shoutout-message">Message:</label>
+    <textarea id="shoutout-message" rows="4"></textarea>
+
+    <button onclick="saveShoutout()">Save Shoutout</button>
+    <div class="success" id="shoutout-success-msg"></div>
+    <div class="error" id="shoutout-error-msg"></div>
+  </section>
+
+  <!-- Suggestions Section -->
+  <section id="suggestions-list">
+    <h3>Suggestions</h3>
+    <div id="suggestions-container">
+      <!-- Suggestions will be dynamically loaded here -->
+    </div>
+  </section>
 
   <script>
+    // Function to fetch the current shoutout from the sheet
+    async function fetchShoutout() {
+      try {
+        const res = await fetch('https://script.google.com/macros/s/AKfycbwY3LOFYimdP1rWji4d4wGM_JqikBqPPVgyAx2Uw-4/exec?action=getShoutout');
+        const data = await res.json();
+        if (data && data.name && data.message) {
+          document.getElementById('shoutout-name').value = data.name;
+          document.getElementById('shoutout-message').value = data.message;
+        }
+      } catch (error) {
+        console.error('Error fetching shoutout:', error);
+      }
+    }
+
+    // Function to save the shoutout to Google Sheets
     async function saveShoutout() {
       const name = document.getElementById('shoutout-name').value;
       const message = document.getElementById('shoutout-message').value;
+
+      if (!name || !message) {
+        document.getElementById('shoutout-error-msg').textContent = 'Both name and message are required!';
+        return;
+      }
 
       try {
         const res = await fetch('https://script.google.com/macros/s/AKfycbwY3LOFYimdP1rWji4d4wGM_JqikBqPPVgyAx2Uw-4/exec', {
@@ -67,12 +115,46 @@
         });
 
         const data = await res.json();
-        document.getElementById('success-msg').textContent = data.message || 'Shoutout saved!';
+        document.getElementById('shoutout-success-msg').textContent = data.message || 'Shoutout saved successfully!';
+        document.getElementById('shoutout-error-msg').textContent = '';
       } catch (error) {
         console.error('Error saving shoutout:', error);
-        document.getElementById('success-msg').textContent = 'Failed to save shoutout.';
+        document.getElementById('shoutout-success-msg').textContent = '';
+        document.getElementById('shoutout-error-msg').textContent = 'Failed to save shoutout.';
       }
     }
+
+    // Function to fetch all suggestions from the sheet
+    async function fetchSuggestions() {
+      try {
+        const res = await fetch('https://script.google.com/macros/s/AKfycbwY3LOFYimdP1rWji4d4wGM_JqikBqPPVgyAx2Uw-4/exec?action=getSuggestions');
+        const data = await res.json();
+        const suggestionsContainer = document.getElementById('suggestions-container');
+
+        if (data && data.suggestions) {
+          suggestionsContainer.innerHTML = ''; // Clear existing suggestions
+
+          data.suggestions.forEach(suggestion => {
+            const suggestionItem = document.createElement('div');
+            suggestionItem.classList.add('suggestion-item');
+            suggestionItem.innerHTML = `
+              <strong>${suggestion.name}</strong> at ${suggestion.time}:
+              <p>${suggestion.text}</p>
+            `;
+            suggestionsContainer.appendChild(suggestionItem);
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching suggestions:', error);
+      }
+    }
+
+    // Fetch shoutout and suggestions when the page loads
+    window.onload = function() {
+      fetchShoutout();
+      fetchSuggestions();
+    };
   </script>
+
 </body>
 </html>
