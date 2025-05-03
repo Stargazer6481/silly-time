@@ -198,6 +198,10 @@
   function closeIframe() {
     iframeViewer.style.display = 'none';
     iframeWrapper.innerHTML = '';
+    // Exit fullscreen when closing
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    }
   }
 
   function toggleFullscreen() {
