@@ -212,16 +212,19 @@
     }
   }
 
-  function displayShoutout() {
-    const name = localStorage.getItem('shoutoutName');
-    const message = localStorage.getItem('shoutoutMessage');
-    
-    if (name && message) {
-      shoutoutName.textContent = name;
-      shoutoutMessage.textContent = message;
-      shoutoutBanner.style.display = 'block';
-    }
+  async function displayShoutout() {
+  try {
+    const res = await fetch('https://raw.githubusercontent.com/stargazer6481/silly-time/main/shoutout.json');
+    const data = await res.json();
+
+    shoutoutName.textContent = data.name;
+    shoutoutMessage.textContent = data.message;
+    shoutoutBanner.style.display = 'block';
+  } catch (err) {
+    console.error('Failed to load shoutout:', err);
   }
+}
+
 
   searchInput.addEventListener('input', () => {
     const query = searchInput.value.toLowerCase();
