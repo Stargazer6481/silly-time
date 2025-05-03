@@ -83,17 +83,17 @@
   <script>
     // Function to fetch the current shoutout from the sheet
     async function fetchShoutout() {
-      try {
-        const res = await fetch('https://script.google.com/macros/s/AKfycbwY3LOFYimdP1rWji4d4wGM_JqikBqPPVgyAx2Uw-4/exec?action=getShoutout');
-        const data = await res.json();
-        if (data && data.name && data.message) {
-          document.getElementById('shoutout-name').value = data.name;
-          document.getElementById('shoutout-message').value = data.message;
-        }
-      } catch (error) {
-        console.error('Error fetching shoutout:', error);
-      }
+  try {
+    const res = await fetch('https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec?action=getShoutout');
+    const data = await res.json();
+    if (data && data.name && data.message) {
+      document.getElementById('shoutout-name').value = data.name;
+      document.getElementById('shoutout-message').value = data.message;
     }
+  } catch (error) {
+    console.error('Error fetching shoutout:', error);
+  }
+}
 
     // Function to save the shoutout to Google Sheets
     async function saveShoutout() {
@@ -106,7 +106,7 @@
       }
 
       try {
-        const res = await fetch('https://script.google.com/macros/s/AKfycbwY3LOFYimdP1rWji4d4wGM_JqikBqPPVgyAx2Uw-4/exec', {
+        const res = await fetch('https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -126,28 +126,28 @@
 
     // Function to fetch all suggestions from the sheet
     async function fetchSuggestions() {
-      try {
-        const res = await fetch('https://script.google.com/macros/s/AKfycbwY3LOFYimdP1rWji4d4wGM_JqikBqPPVgyAx2Uw-4/exec?action=getSuggestions');
-        const data = await res.json();
-        const suggestionsContainer = document.getElementById('suggestions-container');
+  try {
+    const res = await fetch('https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec?action=getSuggestions');
+    const data = await res.json();
+    const suggestionsContainer = document.getElementById('suggestions-container');
 
-        if (data && data.suggestions) {
-          suggestionsContainer.innerHTML = ''; // Clear existing suggestions
+    if (data && data.suggestions) {
+      suggestionsContainer.innerHTML = ''; // Clear existing suggestions
 
-          data.suggestions.forEach(suggestion => {
-            const suggestionItem = document.createElement('div');
-            suggestionItem.classList.add('suggestion-item');
-            suggestionItem.innerHTML = `
-              <strong>${suggestion.name}</strong> at ${suggestion.time}:
-              <p>${suggestion.text}</p>
-            `;
-            suggestionsContainer.appendChild(suggestionItem);
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching suggestions:', error);
-      }
+      data.suggestions.forEach(suggestion => {
+        const suggestionItem = document.createElement('div');
+        suggestionItem.classList.add('suggestion-item');
+        suggestionItem.innerHTML = `
+          <strong>${suggestion.name}</strong> at ${suggestion.time}:
+          <p>${suggestion.text}</p>
+        `;
+        suggestionsContainer.appendChild(suggestionItem);
+      });
     }
+  } catch (error) {
+    console.error('Error fetching suggestions:', error);
+  }
+}
 
     // Fetch shoutout and suggestions when the page loads
     window.onload = function() {

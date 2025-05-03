@@ -12,25 +12,24 @@
       color: white;
     }
 
-    /* Shoutout Banner Styling */
     .shoutout-banner {
       background-color: #333;
       padding: 1rem;
       text-align: center;
       font-size: 1.2rem;
       color: white;
-      display: none; /* Hidden by default */
+      display: none;
     }
     .shoutout-title {
       font-weight: bold;
-      font-size: 1.2rem; /* Smaller */
+      font-size: 1.2rem;
     }
     .shoutout-name {
       font-weight: bold;
-      font-size: 2rem; /* Bigger */
+      font-size: 2rem;
     }
     .shoutout-message {
-      font-size: 1.2rem; /* Medium */
+      font-size: 1.2rem;
       margin-top: 0.5rem;
     }
 
@@ -49,12 +48,14 @@
       background: #2a2a2a;
       color: white;
     }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
       gap: 1rem;
       padding: 1rem;
     }
+
     .game {
       background: #1e1e1e;
       border-radius: 10px;
@@ -74,6 +75,7 @@
       padding: 0.5rem;
       text-align: center;
     }
+
     .iframe-container {
       position: fixed;
       top: 0;
@@ -92,35 +94,32 @@
       border: none;
     }
 
-    /* Fullscreen Button */
     .fullscreen-btn {
       position: absolute;
       top: 1rem;
       right: 7rem;
       padding: 0.5rem 1rem;
       font-size: 1rem;
-      background: #28a745; /* Green */
+      background: #28a745;
       border: none;
       border-radius: 8px;
       color: white;
       cursor: pointer;
     }
 
-    /* Close Button */
     .close-btn {
       position: absolute;
       top: 1rem;
       right: 1rem;
       padding: 0.5rem 1rem;
       font-size: 1rem;
-      background: crimson; /* Red */
+      background: crimson;
       border: none;
       border-radius: 8px;
       color: white;
       cursor: pointer;
     }
 
-    /* Admin Login Button Style */
     .admin-login-btn {
       position: fixed;
       bottom: 1rem;
@@ -140,7 +139,6 @@
       background-color: #555;
     }
 
-    /* Admin Panel Style */
     #admin-panel {
       background-color: #1f1f1f;
       padding: 2rem;
@@ -160,7 +158,6 @@
       border-radius: 8px;
     }
 
-    /* Suggestion Button */
     .suggestion-btn {
       position: fixed;
       bottom: 1rem;
@@ -178,12 +175,10 @@
     .suggestion-btn:hover {
       background-color: #1565c0;
     }
-
   </style>
 </head>
 <body>
 
-<!-- Shoutout Banner -->
 <div class="shoutout-banner" id="shoutout-banner">
   <div class="shoutout-title">Shoutout</div>
   <div class="shoutout-name" id="shoutout-name-value">Shoutout Name</div>
@@ -202,17 +197,15 @@
   <div id="iframe-wrapper"></div>
 </div>
 
-<!-- Admin Panel -->
 <div id="admin-panel" style="display: none;">
   <h2>Admin Panel</h2>
   <h3>Suggestions</h3>
-  <ul id="suggestion-list"></ul> <!-- Suggestions will appear here -->
+  <ul id="suggestion-list"></ul>
 </div>
 
-<!-- Admin Login Button -->
-<a href="https://stargazer6481.github.io/silly-time/admin-login.html" class="admin-login-btn">Admin Login</a>
+<!-- FIXED: Admin Login Button (assumes same folder) -->
+<a href="admin-login.html" class="admin-login-btn">Admin Login</a>
 
-<!-- Suggestion Button -->
 <button class="suggestion-btn" onclick="openSuggestionPrompt()">Send Suggestion</button>
 
 <script>
@@ -255,7 +248,6 @@
   function closeIframe() {
     iframeViewer.style.display = 'none';
     iframeWrapper.innerHTML = '';
-    // Exit fullscreen when closing
     if (document.fullscreenElement) {
       document.exitFullscreen();
     }
@@ -273,7 +265,6 @@
     try {
       const res = await fetch('https://raw.githubusercontent.com/stargazer6481/silly-time/main/shoutout.json');
       const data = await res.json();
-
       shoutoutName.textContent = data.name;
       shoutoutMessage.textContent = data.message;
       shoutoutBanner.style.display = 'block';
@@ -289,8 +280,7 @@
       existing.push({ text: suggestion, time: new Date().toISOString() });
       localStorage.setItem('suggestions', JSON.stringify(existing));
 
-      // Send to Google Sheets via API
-      fetch('https://script.google.com/macros/s/AKfycbwY3LOFYimdP1rWji4d4wGM_JqikBqPPVgyAx2Uw-4/exec', {
+      fetch('https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec', {
         method: 'POST',
         body: JSON.stringify({ suggestion: suggestion, time: new Date().toISOString() })
       }).then(() => alert('Thanks for your suggestion!'));
@@ -298,9 +288,8 @@
   }
 
   async function loadSuggestions() {
-    const res = await fetch('https://script.google.com/macros/s/AKfycbwY3LOFYimdP1rWji4d4wGM_JqikBqPPVgyAx2Uw-4/exec');
+    const res = await fetch('https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec');
     const data = await res.json();
-    
     suggestionList.innerHTML = '';
     data.suggestions.forEach(suggestion => {
       const li = document.createElement('li');
@@ -311,17 +300,13 @@
 
   searchInput.addEventListener('input', () => {
     const query = searchInput.value.toLowerCase();
-    const filtered = games.filter(game =>
-      game.name.toLowerCase().includes(query)
-    );
+    const filtered = games.filter(game => game.name.toLowerCase().includes(query));
     renderGames(filtered);
   });
 
-  // Display saved shoutout on page load
   displayShoutout();
-
   loadGames();
-  loadSuggestions(); // Load suggestions when the page loads
+  loadSuggestions();
 </script>
 
 </body>
