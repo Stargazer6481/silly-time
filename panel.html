@@ -53,14 +53,25 @@
   <div class="success" id="success-msg"></div>
 
   <script>
-    function saveShoutout() {
+    async function saveShoutout() {
       const name = document.getElementById('shoutout-name').value;
       const message = document.getElementById('shoutout-message').value;
 
-      localStorage.setItem('shoutoutName', name);
-      localStorage.setItem('shoutoutMessage', message);
+      try {
+        const res = await fetch('https://script.google.com/macros/s/AKfycbwY3LOFYimdP1rWji4d4wGM_JqikBqPPVgyAx2Uw-4/exec', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ shoutoutName: name, shoutoutMessage: message }),
+        });
 
-      document.getElementById('success-msg').textContent = 'Shoutout saved!';
+        const data = await res.json();
+        document.getElementById('success-msg').textContent = data.message || 'Shoutout saved!';
+      } catch (error) {
+        console.error('Error saving shoutout:', error);
+        document.getElementById('success-msg').textContent = 'Failed to save shoutout.';
+      }
     }
   </script>
 </body>
