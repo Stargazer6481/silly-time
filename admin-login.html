@@ -3,71 +3,158 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Login</title>
+  <title>Admin Panel</title>
   <style>
     body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
       background-color: #121212;
       color: white;
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .login-container {
-      background-color: #1f1f1f;
       padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
     }
-    .login-container input {
+
+    h1 {
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    input, textarea {
       width: 100%;
       padding: 0.5rem;
-      margin: 0.5rem 0;
-      background-color: #2a2a2a;
-      color: white;
-      border: none;
-      border-radius: 4px;
-    }
-    .login-container button {
-      width: 100%;
-      padding: 0.5rem;
-      background-color: #00bfff;
-      border: none;
-      border-radius: 4px;
-      color: white;
       font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      background: #2a2a2a;
+      color: white;
+    }
+
+    button {
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 8px;
       cursor: pointer;
     }
-    .error {
-      color: red;
-      text-align: center;
+
+    button:hover {
+      background-color: #1565c0;
+    }
+
+    .success {
+      margin-top: 1rem;
+      color: #4caf50;
+    }
+
+    .suggestions-container {
+      margin-top: 3rem;
+    }
+
+    .suggestion {
+      background: #1f1f1f;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+    }
+
+    .suggestion-time {
+      font-size: 0.85rem;
+      color: #999;
+      margin-bottom: 0.3rem;
+    }
+
+    .delete-btn {
       margin-top: 0.5rem;
+      background-color: crimson;
+    }
+
+    .delete-btn:hover {
+      background-color: darkred;
     }
   </style>
 </head>
 <body>
-  <div class="login-container">
-    <h2>Admin Login</h2>
-    <input type="text" id="username" placeholder="Username" />
-    <input type="password" id="password" placeholder="Password" />
-    <button onclick="login()">Login</button>
-    <div class="error" id="error-msg"></div>
+  <h1>Admin Panel</h1>
+
+  <!-- Shoutout Form -->
+  <div class="form-group">
+    <label for="shoutout-name">Shoutout Name:</label>
+    <input type="text" id="shoutout-name" placeholder="Enter name">
+  </div>
+  <div class="form-group">
+    <label for="shoutout-message">Shoutout Message:</label>
+    <textarea id="shoutout-message" placeholder="Enter message"></textarea>
+  </div>
+  <button onclick="saveShoutout()">Save Shoutout</button>
+  <div class="success" id="success-msg"></div>
+
+  <!-- Suggestions Viewer -->
+  <div class="suggestions-container">
+    <h2>User Suggestions</h2>
+    <div id="suggestions-list"></div>
   </div>
 
   <script>
-    function login() {
-      const u = document.getElementById('username').value;
-      const p = document.getElementById('password').value;
-      const error = document.getElementById('error-msg');
+    function saveShoutout() {
+      const name = document.getElementById('shoutout-name').value.trim();
+      const message = document.getElementById('shoutout-message').value.trim();
+      const successMsg = document.getElementById('success-msg');
 
-      if (u === 'admin' && p === 'secret') {
-        window.location.href = 'panel.html';
-      } else {
-        error.textContent = 'Incorrect username or password.';
+      if (!name || !message) {
+        successMsg.textContent = "Please fill out both fields.";
+        successMsg.style.color = "crimson";
+        return;
       }
+
+      const shoutoutData = {
+        name,
+        message
+      };
+
+      // Upload to GitHub via a GitHub Action or replace this with actual hosting logic.
+      // For now, just show success (simulate save).
+      successMsg.textContent = "Shoutout saved successfully! (Simulated)";
+      successMsg.style.color = "#4caf50";
+
+      // Optional: Save to localStorage for testing
+      localStorage.setItem('latestShoutout', JSON.stringify(shoutoutData));
     }
+
+    function loadSuggestions() {
+      const container = document.getElementById('suggestions-list');
+      const suggestions = JSON.parse(localStorage.getItem('suggestions') || '[]');
+      container.innerHTML = '';
+
+      if (suggestions.length === 0) {
+        container.innerHTML = '<p>No suggestions yet.</p>';
+        return;
+      }
+
+      suggestions.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'suggestion';
+        div.innerHTML = `
+          <div class="suggestion-time">${new Date(item.time).toLocaleString()}</div>
+          <div>${item.text}</div>
+          <button class="delete-btn" onclick="deleteSuggestion(${index})">Delete</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function deleteSuggestion(index) {
+      const suggestions = JSON.parse(localStorage.getItem('suggestions') || '[]');
+      suggestions.splice(index, 1);
+      localStorage.setItem('suggestions', JSON.stringify(suggestions));
+      loadSuggestions();
+    }
+
+    // Load on start
+    loadSuggestions();
   </script>
 </body>
 </html>

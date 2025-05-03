@@ -134,6 +134,23 @@
     .admin-login-btn:hover {
       background-color: #555;
     }
+    /* Suggestion Button */
+    .suggestion-btn {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      padding: 0.7rem 1.2rem;
+      font-size: 1rem;
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 9999;
+    }
+    .suggestion-btn:hover {
+      background-color: #1565c0;
+    }
   </style>
 </head>
 <body>
@@ -159,6 +176,9 @@
 
 <!-- Admin Login Button -->
 <a href="https://stargazer6481.github.io/silly-time/admin-login.html" class="admin-login-btn">Admin Login</a>
+
+<!-- Suggestion Button -->
+<button class="suggestion-btn" onclick="openSuggestionPrompt()">Send Suggestion</button>
 
 <script>
   let games = [];
@@ -213,18 +233,26 @@
   }
 
   async function displayShoutout() {
-  try {
-    const res = await fetch('https://raw.githubusercontent.com/stargazer6481/silly-time/main/shoutout.json');
-    const data = await res.json();
-
-    shoutoutName.textContent = data.name;
-    shoutoutMessage.textContent = data.message;
-    shoutoutBanner.style.display = 'block';
-  } catch (err) {
-    console.error('Failed to load shoutout:', err);
+    try {
+      const res = await fetch('https://raw.githubusercontent.com/stargazer6481/silly-time/main/shoutout.json');
+      const data = await res.json();
+      shoutoutName.textContent = data.name;
+      shoutoutMessage.textContent = data.message;
+      shoutoutBanner.style.display = 'block';
+    } catch (err) {
+      console.error('Failed to load shoutout:', err);
+    }
   }
-}
 
+  function openSuggestionPrompt() {
+    const suggestion = prompt("What's your suggestion?");
+    if (suggestion) {
+      const existing = JSON.parse(localStorage.getItem('suggestions') || '[]');
+      existing.push({ text: suggestion, time: new Date().toISOString() });
+      localStorage.setItem('suggestions', JSON.stringify(existing));
+      alert('Thanks for your suggestion!');
+    }
+  }
 
   searchInput.addEventListener('input', () => {
     const query = searchInput.value.toLowerCase();
@@ -234,9 +262,7 @@
     renderGames(filtered);
   });
 
-  // Display saved shoutout on page load
   displayShoutout();
-
   loadGames();
 </script>
 
