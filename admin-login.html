@@ -2,159 +2,161 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel - Silly Time</title>
   <style>
     body {
-      margin: 0;
       font-family: 'Segoe UI', sans-serif;
       background-color: #121212;
       color: white;
-      padding: 2rem;
+      margin: 0;
     }
 
-    h1 {
+    header {
+      padding: 1rem;
+      background: #1f1f1f;
       text-align: center;
     }
 
-    .form-group {
-      margin-bottom: 1rem;
+    h1 {
+      margin: 0;
     }
 
-    input, textarea {
+    #suggestion-list {
+      margin-top: 2rem;
+      list-style-type: none;
+      padding: 0;
+    }
+
+    #suggestion-list li {
+      background-color: #333;
+      padding: 1rem;
+      margin: 0.5rem 0;
+      border-radius: 8px;
+    }
+
+    .back-btn {
+      padding: 0.5rem 1rem;
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 1rem;
+      margin: 1rem;
+    }
+
+    .back-btn:hover {
+      background-color: #1565c0;
+    }
+
+    /* Shoutout Form */
+    .shoutout-form {
+      background-color: #1f1f1f;
+      padding: 2rem;
+      margin-top: 2rem;
+      border-radius: 8px;
+    }
+
+    .shoutout-form input,
+    .shoutout-form textarea {
       width: 100%;
-      padding: 0.5rem;
+      padding: 1rem;
       font-size: 1rem;
       border: none;
       border-radius: 8px;
       background: #2a2a2a;
       color: white;
+      margin-bottom: 1rem;
     }
 
-    button {
-      padding: 0.6rem 1.2rem;
+    .shoutout-form button {
+      padding: 0.5rem 1.2rem;
       font-size: 1rem;
-      background-color: #1976d2;
+      background-color: #28a745;
       color: white;
       border: none;
       border-radius: 8px;
       cursor: pointer;
     }
 
-    button:hover {
-      background-color: #1565c0;
-    }
-
-    .success {
-      margin-top: 1rem;
-      color: #4caf50;
-    }
-
-    .suggestions-container {
-      margin-top: 3rem;
-    }
-
-    .suggestion {
-      background: #1f1f1f;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      border-radius: 8px;
-    }
-
-    .suggestion-time {
-      font-size: 0.85rem;
-      color: #999;
-      margin-bottom: 0.3rem;
-    }
-
-    .delete-btn {
-      margin-top: 0.5rem;
-      background-color: crimson;
-    }
-
-    .delete-btn:hover {
-      background-color: darkred;
+    .shoutout-form button:hover {
+      background-color: #218838;
     }
   </style>
 </head>
 <body>
-  <h1>Admin Panel</h1>
 
-  <!-- Shoutout Form -->
-  <div class="form-group">
-    <label for="shoutout-name">Shoutout Name:</label>
-    <input type="text" id="shoutout-name" placeholder="Enter name">
-  </div>
-  <div class="form-group">
-    <label for="shoutout-message">Shoutout Message:</label>
-    <textarea id="shoutout-message" placeholder="Enter message"></textarea>
-  </div>
-  <button onclick="saveShoutout()">Save Shoutout</button>
-  <div class="success" id="success-msg"></div>
+<header>
+  <h1>Admin Panel - Silly Time</h1>
+</header>
 
-  <!-- Suggestions Viewer -->
-  <div class="suggestions-container">
-    <h2>User Suggestions</h2>
-    <div id="suggestions-list"></div>
-  </div>
+<div id="suggestion-section">
+  <h2>Suggestions</h2>
+  <ul id="suggestion-list"></ul> <!-- Suggestions will appear here -->
+</div>
 
-  <script>
-    function saveShoutout() {
-      const name = document.getElementById('shoutout-name').value.trim();
-      const message = document.getElementById('shoutout-message').value.trim();
-      const successMsg = document.getElementById('success-msg');
+<!-- Shoutout Form -->
+<div class="shoutout-form">
+  <h3>Set Daily Shoutout</h3>
+  <label for="shoutout-name">Name:</label>
+  <input type="text" id="shoutout-name" placeholder="Enter shoutout name" />
+  <label for="shoutout-message">Message:</label>
+  <textarea id="shoutout-message" placeholder="Enter shoutout message"></textarea>
+  <button onclick="setShoutout()">Save Shoutout</button>
+</div>
 
-      if (!name || !message) {
-        successMsg.textContent = "Please fill out both fields.";
-        successMsg.style.color = "crimson";
-        return;
-      }
+<!-- Back Button -->
+<a href="index.html" class="back-btn">Back to Main Page</a>
 
-      const shoutoutData = {
-        name,
-        message
-      };
+<script>
+  // Function to load suggestions from Google Sheets API
+  async function loadSuggestions() {
+    try {
+      const res = await fetch('https://script.google.com/macros/s/AKfycbwY3LOFYimdP1rWji4d4wGM_JqikBqPPVgyAx2Uw-4/exec');
+      const data = await res.json();
+      const suggestionList = document.getElementById('suggestion-list');
 
-      // Upload to GitHub via a GitHub Action or replace this with actual hosting logic.
-      // For now, just show success (simulate save).
-      successMsg.textContent = "Shoutout saved successfully! (Simulated)";
-      successMsg.style.color = "#4caf50";
+      suggestionList.innerHTML = ''; // Clear the existing list
 
-      // Optional: Save to localStorage for testing
-      localStorage.setItem('latestShoutout', JSON.stringify(shoutoutData));
-    }
-
-    function loadSuggestions() {
-      const container = document.getElementById('suggestions-list');
-      const suggestions = JSON.parse(localStorage.getItem('suggestions') || '[]');
-      container.innerHTML = '';
-
-      if (suggestions.length === 0) {
-        container.innerHTML = '<p>No suggestions yet.</p>';
-        return;
-      }
-
-      suggestions.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = 'suggestion';
-        div.innerHTML = `
-          <div class="suggestion-time">${new Date(item.time).toLocaleString()}</div>
-          <div>${item.text}</div>
-          <button class="delete-btn" onclick="deleteSuggestion(${index})">Delete</button>
-        `;
-        container.appendChild(div);
+      // Add each suggestion to the list
+      data.suggestions.forEach(suggestion => {
+        const li = document.createElement('li');
+        li.textContent = suggestion.text;
+        suggestionList.appendChild(li);
       });
+    } catch (error) {
+      console.error('Error loading suggestions:', error);
+    }
+  }
+
+  // Function to save shoutout message to Google Sheets API
+  async function setShoutout() {
+    const shoutoutName = document.getElementById('shoutout-name').value;
+    const shoutoutMessage = document.getElementById('shoutout-message').value;
+
+    if (!shoutoutName || !shoutoutMessage) {
+      alert("Please fill in both the name and message.");
+      return;
     }
 
-    function deleteSuggestion(index) {
-      const suggestions = JSON.parse(localStorage.getItem('suggestions') || '[]');
-      suggestions.splice(index, 1);
-      localStorage.setItem('suggestions', JSON.stringify(suggestions));
-      loadSuggestions();
-    }
+    try {
+      await fetch('https://script.google.com/macros/s/AKfycbwY3LOFYimdP1rWji4d4wGM_JqikBqPPVgyAx2Uw-4/exec', {
+        method: 'POST',
+        body: JSON.stringify({ shoutoutName, shoutoutMessage }),
+      });
 
-    // Load on start
-    loadSuggestions();
-  </script>
+      alert('Shoutout saved successfully!');
+    } catch (error) {
+      console.error('Error saving shoutout:', error);
+      alert('Failed to save shoutout.');
+    }
+  }
+
+  // Call the loadSuggestions function when the page loads
+  window.onload = loadSuggestions;
+</script>
+
 </body>
 </html>
