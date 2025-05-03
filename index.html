@@ -80,6 +80,24 @@
       color: white;
       cursor: pointer;
     }
+    /* Admin Login Button Style */
+    .admin-login-btn {
+      position: fixed;
+      bottom: 1rem;
+      left: 1rem;
+      padding: 0.7rem 1.2rem;
+      font-size: 1rem;
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+    }
+    .admin-login-btn:hover {
+      background-color: #555;
+    }
   </style>
 </head>
 <body>
@@ -94,6 +112,9 @@
   <button onclick="closeIframe()">Close</button>
   <div id="iframe-wrapper"></div>
 </div>
+
+<!-- Admin Login Button -->
+<a href="https://stargazer6481.github.io/silly-time/admin-login.html" class="admin-login-btn">Admin Login</a>
 
 <script>
   let games = [];
