@@ -34,6 +34,12 @@
       color: #ffffff;
     }
 
+    .user-name {
+      font-size: 18px;
+      color: #ffffff;
+      font-weight: bold;
+    }
+
     .messages {
       flex-grow: 1;
       overflow-y: auto;
@@ -51,6 +57,8 @@
       max-width: 75%;
       word-wrap: break-word;
       font-size: 14px;
+      display: flex;
+      flex-direction: column;
     }
 
     .message-user {
@@ -61,6 +69,13 @@
     .message-bot {
       background-color: #40444b;
       margin-right: auto;
+    }
+
+    .timestamp {
+      font-size: 12px;
+      color: #999999;
+      margin-top: 5px;
+      align-self: flex-end;
     }
 
     .input-area {
@@ -135,6 +150,11 @@
       <!-- Placeholder for profile icon or user settings -->
     </div>
   </div>
+
+  <!-- User's Name -->
+  <div class="user-name" id="user-name">
+    User Name Here
+  </div>
   
   <div class="messages" id="messages-container">
     <!-- Messages will appear here -->
@@ -167,7 +187,16 @@
       data.messages.forEach(message => {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message', message.name === 'User' ? 'message-user' : 'message-bot');
-        messageDiv.innerHTML = `<strong>${message.name}:</strong> ${message.text}`;
+        
+        // Format the timestamp to a human-readable format
+        const timestamp = new Date(message.time);
+        const formattedTimestamp = `${timestamp.getHours()}:${timestamp.getMinutes()}`;
+        
+        messageDiv.innerHTML = `
+          <strong>${message.name}</strong>
+          <p>${message.text}</p>
+          <span class="timestamp">${formattedTimestamp}</span>
+        `;
         messagesContainer.appendChild(messageDiv);
       });
     }
