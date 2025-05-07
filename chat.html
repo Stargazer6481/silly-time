@@ -119,14 +119,14 @@
   </div>
 
   <script>
-    const SCRIPT_URL = 'YOUR_SCRIPT_WEB_APP_URL_HERE';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec';
 
     function avatarLetter(name) {
       return name ? name.trim()[0].toUpperCase() : '?';
     }
 
     async function fetchChat() {
-      const res = await fetch(${SCRIPT_URL}?action=getChat);
+      const res = await fetch(`${SCRIPT_URL}?action=getChat`);
       const data = await res.json();
       const log = document.getElementById('chatLog');
       log.innerHTML = '';
@@ -152,7 +152,7 @@
       const message = document.getElementById('chatText').value.trim();
       if (!name || !message) return alert('Both name and message required');
 
-      await fetch(${SCRIPT_URL}?action=addChatMessage, {
+      await fetch(`${SCRIPT_URL}?action=addChatMessage`, {
         method: 'POST',
         body: JSON.stringify({ name, message }),
       });
