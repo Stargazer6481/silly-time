@@ -3,170 +3,52 @@
 <head>
   <title>Chat Room</title>
   <style>
-    body {
-      margin: 0;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #2f3136;
-      color: #dcddde;
-    }
-
-    .chat-container {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-
-    .chat-header {
-      background-color: #202225;
-      padding: 15px;
-      font-size: 20px;
-      font-weight: bold;
-      color: white;
-      border-bottom: 1px solid #1e1f22;
-    }
-
-    .chat-log {
-      flex-grow: 1;
-      overflow-y: auto;
-      padding: 15px;
-    }
-
-    .chat-message {
-      margin-bottom: 15px;
-      display: flex;
-      align-items: flex-start;
-    }
-
-    .avatar {
-      width: 40px;
-      height: 40px;
-      background-color: #7289da;
-      border-radius: 50%;
-      margin-right: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      color: white;
-      font-size: 18px;
-    }
-
-    .message-content {
-      background-color: #36393f;
-      padding: 10px 15px;
-      border-radius: 10px;
-      max-width: 600px;
-    }
-
-    .message-name {
-      font-weight: bold;
-      margin-bottom: 5px;
-      color: #ffffff;
-    }
-
-    .chat-input {
-      display: flex;
-      padding: 10px;
-      background-color: #40444b;
-      border-top: 1px solid #1e1f22;
-    }
-
-    .chat-input input, .chat-input textarea {
-      background-color: #303339;
-      color: #dcddde;
-      border: none;
-      padding: 10px;
-      border-radius: 5px;
-      font-size: 14px;
-      margin-right: 10px;
-    }
-
-    .chat-input input {
-      width: 150px;
-    }
-
-    .chat-input textarea {
-      flex-grow: 1;
-      resize: none;
-      height: 50px;
-    }
-
-    .chat-input button {
-      background-color: #7289da;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .chat-input button:hover {
-      background-color: #5b6eae;
-    }
+    body { font-family: sans-serif; padding: 20px; }
+    input, textarea { display: block; margin: 10px 0; width: 300px; }
+    button { margin-top: 5px; }
+    ul { list-style-type: none; padding-left: 0; }
   </style>
 </head>
 <body>
-  <div class="chat-container">
-    <div class="chat-header">💬 Chat Room</div>
+  <h1>💬 Chat Room</h1>
 
-    <div id="chatLog" class="chat-log"></div>
+  <input id="chatName" placeholder="Your name" />
+  <textarea id="chatText" placeholder="Say something..."></textarea>
+  <button onclick="sendChat()">Send</button>
 
-    <div class="chat-input">
-      <input id="chatName" placeholder="Your name" />
-      <textarea id="chatText" placeholder="Say something..."></textarea>
-      <button onclick="sendChat()">Send</button>
-    </div>
-  </div>
+  <h3>🗨️ Chat Log</h3>
+  <ul id="chatLog"></ul>
 
   <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec';
 
-    function avatarLetter(name) {
-      return name ? name.trim()[0].toUpperCase() : '?';
-    }
-
     async function fetchChat() {
       const res = await fetch(`${SCRIPT_URL}?action=getChat`);
       const data = await res.json();
-      const log = document.getElementById('chatLog');
-      log.innerHTML = '';
+      const ul = document.getElementById('chatLog');
+      ul.innerHTML = '';
       data.messages.forEach(m => {
-        const div = document.createElement('div');
-        div.className = 'chat-message';
-        div.innerHTML = `
-          <div>
-            <div class="avatar">${avatarLetter(m.name)}</div>
-            <div class="message-content">
-              <div class="message-name">${m.name}</div>
-              <div class="message-text">${m.text}</div>
-            </div>
-          </div>
-        `;
-        log.appendChild(div);
+        const li = document.createElement('li');
+        li.textContent = `${m.name}: ${m.text} (${new Date(m.time).toLocaleTimeString()})`;
+        ul.appendChild(li);
       });
-      log.scrollTop = log.scrollHeight;
     }
 
     async function sendChat() {
-  const name = document.getElementById('chatName').value.trim();
-  const message = document.getElementById('chatText').value.trim();
-  if (!name || !message) return alert('Both name and message required');
+      const name = document.getElementById('chatName').value;
+      const message = document.getElementById('chatText').value;
+      if (!name || !message) return alert('Both fields are required');
 
-  await fetch(`${SCRIPT_URL}?action=addChatMessage`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ name, message })
-  });
-
-  document.getElementById('chatText').value = '';
-  fetchChat();
-}
-
+      await fetch(`${SCRIPT_URL}?action=addChatMessage`, {
+        method: 'POST',
+        body: JSON.stringify({ name, message }),
+      });
+      document.getElementById('chatText').value = '';
+      fetchChat();
+    }
 
     fetchChat();
-    setInterval(fetchChat, 4000);
+    setInterval(fetchChat, 5000); // Refresh chat every 5s
   </script>
 </body>
 </html>
