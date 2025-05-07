@@ -28,7 +28,13 @@
     };
 
     // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
+// Initialize Firebase only if it hasn't been initialized yet
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+} else {
+  firebase.app(); // Use the default app if already initialized
+}
+
 
     // Get references for authentication
     const auth = firebase.auth();
