@@ -1,62 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Chat App</title>
-
-  <!-- Firebase SDK (non-module version) -->
-  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+  <title>Chat Room</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    input, textarea { display: block; margin: 10px 0; width: 300px; }
+    button { margin-top: 5px; }
+    ul { list-style-type: none; padding-left: 0; }
+  </style>
 </head>
 <body>
-  <h1>Chat App</h1>
+  <h1>💬 Chat Room</h1>
 
-  <!-- Sign-in button -->
-  <button id="sign-in-btn">Sign In</button>
+  <input id="chatName" placeholder="Your name" />
+  <textarea id="chatText" placeholder="Say something..."></textarea>
+  <button onclick="sendChat()">Send</button>
+
+  <h3>🗨️ Chat Log</h3>
+  <ul id="chatLog"></ul>
 
   <script>
-    // Firebase config (use your provided config here)
-    const firebaseConfig = {
-      apiKey: "AIzaSyBkD0t99ruWdPQmaoM081qsWvxIqkZ0XSc",
-      authDomain: "silly-time.firebaseapp.com",
-      projectId: "silly-time",
-      storageBucket: "silly-time.firebasestorage.app",
-      messagingSenderId: "348661962395",
-      appId: "1:348661962395:web:673beb30e80f2e11e4983e"
-    };
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec';
 
-    // Initialize Firebase
-// Initialize Firebase only if it hasn't been initialized yet
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-} else {
-  firebase.app(); // Use the default app if already initialized
-}
+    async function fetchChat() {
+      const res = await fetch(`${SCRIPT_URL}?action=getChat`);
+      const data = await res.json();
+      const ul = document.getElementById('chatLog');
+      ul.innerHTML = '';
+      data.messages.forEach(m => {
+        const li = document.createElement('li');
+        li.textContent = `${m.name}: ${m.text} (${new Date(m.time).toLocaleTimeString()})`;
+        ul.appendChild(li);
+      });
+    }
 
+    async function sendChat() {
+      const name = document.getElementById('chatName').value;
+      const message = document.getElementById('chatText').value;
+      if (!name || !message) return alert('Both fields are required');
 
-    // Get references for authentication
-    const auth = firebase.auth();
-    const firestore = firebase.firestore();
+      await fetch(`${SCRIPT_URL}?action=addChatMessage`, {
+        method: 'POST',
+        body: JSON.stringify({ name, message }),
+      });
+      document.getElementById('chatText').value = '';
+      fetchChat();
+    }
 
-    // Sign in anonymously when the "Sign In" button is clicked
-    document.getElementById("sign-in-btn").addEventListener("click", function() {
-      console.log("Sign In Button Clicked");
-      auth.signInAnonymously()
-        .then(() => {
-          console.log("User signed in anonymously");
-          alert("Signed in successfully");
-        })
-        .catch((error) => {
-          console.log("Error signing in: ", error);
-          alert("Sign-in error: " + error.message);
-        });
-    });
-
-    console.log(firebaseConfig); // Check if it's correct
-firebase.initializeApp(firebaseConfig);
-
+    fetchChat();
+    setInterval(fetchChat, 5000); // Refresh chat every 5s
   </script>
 </body>
 </html>
