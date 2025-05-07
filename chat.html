@@ -148,17 +148,22 @@
     }
 
     async function sendChat() {
-      const name = document.getElementById('chatName').value.trim();
-      const message = document.getElementById('chatText').value.trim();
-      if (!name || !message) return alert('Both name and message required');
+  const name = document.getElementById('chatName').value.trim();
+  const message = document.getElementById('chatText').value.trim();
+  if (!name || !message) return alert('Both name and message required');
 
-      await fetch(`${SCRIPT_URL}?action=addChatMessage`, {
-        method: 'POST',
-        body: JSON.stringify({ name, message }),
-      });
-      document.getElementById('chatText').value = '';
-      fetchChat();
-    }
+  await fetch(`${SCRIPT_URL}?action=addChatMessage`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ name, message })
+  });
+
+  document.getElementById('chatText').value = '';
+  fetchChat();
+}
+
 
     fetchChat();
     setInterval(fetchChat, 4000);
