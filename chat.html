@@ -5,11 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Chat App</title>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-firestore.js"></script>
-
+  <!-- Firebase SDK (non-module version) -->
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
 </head>
 <body>
   <h1>Chat App</h1>
@@ -29,9 +28,11 @@
     };
 
     // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth(app);
-    const firestore = firebase.firestore(app);
+    firebase.initializeApp(firebaseConfig);
+
+    // Get references for authentication
+    const auth = firebase.auth();
+    const firestore = firebase.firestore();
 
     // Sign in anonymously when the "Sign In" button is clicked
     document.getElementById("sign-in-btn").addEventListener("click", function() {
