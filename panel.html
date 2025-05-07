@@ -109,12 +109,19 @@
         const res = await fetch('https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec?action=getShoutout');
         const data = await res.json();
         if (data && data.name && data.message) {
-          document.getElementById('shoutout-name').textContent = data.name;
-          document.getElementById('shoutout-message').textContent = data.message;
-          document.getElementById('shoutout-banner').style.display = 'block';
-          // Set values in the form for editing
-          document.getElementById('shoutout-name-input').value = data.name;
-          document.getElementById('shoutout-message-input').value = data.message;
+          const shoutoutNameElement = document.getElementById('shoutout-name');
+          const shoutoutMessageElement = document.getElementById('shoutout-message');
+          
+          // Check if elements exist before updating
+          if (shoutoutNameElement && shoutoutMessageElement) {
+            shoutoutNameElement.textContent = data.name;
+            shoutoutMessageElement.textContent = data.message;
+            document.getElementById('shoutout-banner').style.display = 'block';
+            
+            // Set values in the form for editing
+            document.getElementById('shoutout-name-input').value = data.name;
+            document.getElementById('shoutout-message-input').value = data.message;
+          }
         }
       } catch (error) {
         console.error('Error fetching shoutout:', error);
@@ -176,10 +183,10 @@
     }
 
     // Wait for the DOM to be fully loaded before executing the functions
-    document.addEventListener('DOMContentLoaded', function () {
+    window.onload = function() {
       fetchShoutout();
       fetchSuggestions();
-    });
+    };
   </script>
 
 </body>
