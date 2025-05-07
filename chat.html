@@ -1,306 +1,167 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Chat App</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <title>Chat Room</title>
   <style>
     body {
-      font-family: 'Roboto', sans-serif;
       margin: 0;
-      padding: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       background-color: #2f3136;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 100vh;
       color: #dcddde;
     }
 
-    .header {
-      background-color: #1e2124;
-      padding: 15px;
-      border-bottom: 1px solid #202225;
+    .chat-container {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
+      height: 100vh;
     }
 
-    .header h1 {
+    .chat-header {
+      background-color: #202225;
+      padding: 15px;
       font-size: 20px;
-      margin: 0;
       font-weight: bold;
-      color: #ffffff;
+      color: white;
+      border-bottom: 1px solid #1e1f22;
     }
 
-    .messages {
+    .chat-log {
       flex-grow: 1;
       overflow-y: auto;
       padding: 15px;
-      margin-top: 10px;
-      background-color: #36393f;
-      border-radius: 10px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
 
-    .message {
+    .chat-message {
       margin-bottom: 15px;
-      padding: 12px;
-      border-radius: 20px;
-      max-width: 75%;
-      word-wrap: break-word;
-      font-size: 14px;
       display: flex;
-      flex-direction: column;
+      align-items: flex-start;
     }
 
-    .message-user {
-      background-color: #3a3d41;
-      margin-left: auto;
-    }
-
-    .message-bot {
-      background-color: #40444b;
-      margin-right: auto;
-    }
-
-    .timestamp {
-      font-size: 12px;
-      color: #999999;
-      margin-top: 5px;
-      align-self: flex-end;
-    }
-
-    .input-area {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px;
-      background-color: #2f3136;
-      border-top: 1px solid #202225;
-      box-shadow: 0 -1px 3px rgba(0,0,0,0.2);
-    }
-
-    .input-area input {
-      width: 80%;
-      padding: 10px;
-      border: 1px solid #202225;
-      border-radius: 20px;
-      font-size: 14px;
-      background-color: #2a2f34;
-      color: #dcddde;
-    }
-
-    .input-area button {
-      width: 15%;
-      padding: 12px;
+    .avatar {
+      width: 40px;
+      height: 40px;
       background-color: #7289da;
-      border: none;
-      color: white;
-      border-radius: 20px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    .input-area button:hover {
-      background-color: #5b6eae;
-    }
-
-    .gif-gallery {
-      display: flex;
-      overflow-x: auto;
-      margin-top: 10px;
-      padding: 15px;
-      background-color: #40444b;
-      border-radius: 10px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-    }
-
-    .gif-item {
+      border-radius: 50%;
       margin-right: 10px;
-      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      font-size: 18px;
+    }
+
+    .message-content {
+      background-color: #36393f;
+      padding: 10px 15px;
       border-radius: 10px;
-      border: 2px solid #202225;
+      max-width: 600px;
     }
 
-    .gif-item img {
-      width: 120px;
-      height: auto;
-      border-radius: 10px;
-      border: 2px solid #202225;
+    .message-name {
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #ffffff;
     }
 
-    /* Smooth scrolling */
-    .messages {
-      scroll-behavior: smooth;
-    }
-
-    .username-container {
-      width: 100%;
+    .chat-input {
+      display: flex;
       padding: 10px;
       background-color: #40444b;
-      border-radius: 10px;
-      margin-bottom: 10px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      border-top: 1px solid #1e1f22;
     }
 
-    .username-input {
-      width: 100%;
-      padding: 10px;
-      border-radius: 10px;
-      font-size: 14px;
-      background-color: #2a2f34;
+    .chat-input input, .chat-input textarea {
+      background-color: #303339;
       color: #dcddde;
-      border: 1px solid #202225;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+
+    .chat-input input {
+      width: 150px;
+    }
+
+    .chat-input textarea {
+      flex-grow: 1;
+      resize: none;
+      height: 50px;
+    }
+
+    .chat-input button {
+      background-color: #7289da;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .chat-input button:hover {
+      background-color: #5b6eae;
     }
   </style>
 </head>
 <body>
-  <div class="header">
-    <h1>Chat</h1>
-    <div class="user-profile">
-      <!-- Placeholder for profile icon or user settings -->
+  <div class="chat-container">
+    <div class="chat-header">💬 Chat Room</div>
+
+    <div id="chatLog" class="chat-log"></div>
+
+    <div class="chat-input">
+      <input id="chatName" placeholder="Your name" />
+      <textarea id="chatText" placeholder="Say something..."></textarea>
+      <button onclick="sendChat()">Send</button>
     </div>
   </div>
 
-  <!-- Username Input -->
-  <div class="username-container">
-    <input type="text" id="username" class="username-input" placeholder="Enter your username" />
-  </div>
-  
-  <div class="messages" id="messages-container">
-    <!-- Messages will appear here -->
-  </div>
-  
-  <div class="input-area">
-    <input type="text" id="chat-message" placeholder="Type a message" />
-    <button id="send-button">Send</button>
-    <button id="gif-button"><i class="fas fa-image"></i> GIF</button>
-  </div>
-
-  <div class="gif-gallery" id="gif-gallery" style="display: none;">
-    <!-- GIFs will appear here -->
-  </div>
-
   <script>
-    // Blocked words list
-    const blockedWords = ['badword1', 'badword2'];  // Add more words here
+    const SCRIPT_URL = 'YOUR_SCRIPT_WEB_APP_URL_HERE';
 
-    function containsBlockedWords(message) {
-      return blockedWords.some(word => message.includes(word));
+    function avatarLetter(name) {
+      return name ? name.trim()[0].toUpperCase() : '?';
     }
 
-    // Function to get messages
-    async function loadMessages() {
-      const response = await fetch('https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec?action=getChat');
-      const data = await response.json();
-      const messagesContainer = document.getElementById("messages-container");
-      messagesContainer.innerHTML = "";  // Clear existing messages
-      data.messages.forEach(message => {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message', message.name === 'User' ? 'message-user' : 'message-bot');
-        
-        // Format the timestamp to a human-readable format
-        const timestamp = new Date(message.time);
-        const formattedTimestamp = `${timestamp.getHours()}:${timestamp.getMinutes()}`;
-        
-        messageDiv.innerHTML = `
-          <strong>${message.name}</strong>
-          <p>${message.text}</p>
-          <span class="timestamp">${formattedTimestamp}</span>
+    async function fetchChat() {
+      const res = await fetch(${SCRIPT_URL}?action=getChat);
+      const data = await res.json();
+      const log = document.getElementById('chatLog');
+      log.innerHTML = '';
+      data.messages.forEach(m => {
+        const div = document.createElement('div');
+        div.className = 'chat-message';
+        div.innerHTML = `
+          <div>
+            <div class="avatar">${avatarLetter(m.name)}</div>
+            <div class="message-content">
+              <div class="message-name">${m.name}</div>
+              <div class="message-text">${m.text}</div>
+            </div>
+          </div>
         `;
-        messagesContainer.appendChild(messageDiv);
+        log.appendChild(div);
       });
+      log.scrollTop = log.scrollHeight;
     }
 
-    async function sendMessage(messageText) {
-  const username = document.getElementById("username").value.trim();
+    async function sendChat() {
+      const name = document.getElementById('chatName').value.trim();
+      const message = document.getElementById('chatText').value.trim();
+      if (!name || !message) return alert('Both name and message required');
 
-  if (!username) {
-    alert("Please enter your username.");
-    return;
-  }
-
-  if (!messageText.trim()) return;
-
-  if (containsBlockedWords(messageText)) {
-    alert("Your message contains inappropriate words.");
-    return;
-  }
-
-  try {
-    const response = await fetch('https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec?action=addChatMessage', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'addChatMessage',
-        name: username,
-        message: messageText
-      })
-    });
-
-    const result = await response.json();
-    console.log("Server response:", result);
-
-    if (result.success || result.result === 'success') {
-      document.getElementById("chat-message").value = '';
-      loadMessages();
-    } else {
-      alert("Message failed to send.");
-    }
-
-  } catch (error) {
-    console.error("Sending error:", error);
-    alert("Failed to send message. See console for details.");
-  }
-}
-
-
-    // Tenor API integration for GIF search
-    const TENOR_API_KEY = 'AIzaSyC8Rxxxwu6_VJf5ZYxcQknPG8fZAyWQgF4';
-    const TENOR_API_URL = 'https://api.tenor.com/search';
-
-    async function fetchGIFs(query) {
-      const response = await fetch(`${TENOR_API_URL}?key=${TENOR_API_KEY}&q=${query}&limit=10`);
-      const data = await response.json();
-      displayGIFs(data.results);
-    }
-
-    function displayGIFs(gifs) {
-      const gallery = document.getElementById('gif-gallery');
-      gallery.innerHTML = ''; // Clear previous GIFs
-
-      gifs.forEach(gif => {
-        const gifElement = document.createElement('div');
-        gifElement.classList.add('gif-item');
-        gifElement.innerHTML = `<img src="${gif.media[0].gif.url}" alt="GIF">`;
-
-        gifElement.addEventListener('click', function() {
-          document.getElementById("chat-message").value += ' ' + gif.media[0].gif.url; // Add gif URL to message input
-          gallery.style.display = 'none'; // Hide the GIF gallery after selecting
-        });
-
-        gallery.appendChild(gifElement);
+      await fetch(${SCRIPT_URL}?action=addChatMessage, {
+        method: 'POST',
+        body: JSON.stringify({ name, message }),
       });
+      document.getElementById('chatText').value = '';
+      fetchChat();
     }
 
-    // Event listeners for the send button and GIF button
-    document.getElementById('send-button').addEventListener('click', function() {
-      const messageInput = document.getElementById("chat-message");
-      sendMessage(messageInput.value);
-      messageInput.value = ''; // Clear input after sending
-    });
-
-    document.getElementById('gif-button').addEventListener('click', function() {
-      const gifQuery = prompt("Enter a keyword for GIF search:");
-      if (gifQuery) {
-        document.getElementById("gif-gallery").style.display = 'flex';
-        fetchGIFs(gifQuery);
-      }
-    });
-
-    loadMessages();  // Initial load of messages
+    fetchChat();
+    setInterval(fetchChat, 4000);
   </script>
 </body>
 </html>
