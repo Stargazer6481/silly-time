@@ -97,7 +97,7 @@
 
     // Function to save the shoutout to Google Sheets
  // Function to save the shoutout to Google Sheets
-async function saveShoutout() {
+ async function saveShoutout() {
   const name = document.getElementById('shoutout-name').value;
   const message = document.getElementById('shoutout-message').value;
 
@@ -107,7 +107,7 @@ async function saveShoutout() {
   }
 
   try {
-    const res = await fetch('https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec?action=setShoutoutInSheet', {
+    const res = await fetch('https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -124,6 +124,7 @@ async function saveShoutout() {
     document.getElementById('shoutout-error-msg').textContent = 'Failed to save shoutout.';
   }
 }
+
 
 
     // Function to fetch all suggestions from the sheet

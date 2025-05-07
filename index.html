@@ -361,32 +361,42 @@
   }
 
   function submitSuggestion() {
-    const name = document.getElementById('suggestion-name').value.trim();
-    const suggestion = document.getElementById('suggestion-text').value.trim();
+  const name = document.getElementById('suggestion-name').value.trim();
+  const suggestion = document.getElementById('suggestion-text').value.trim();
 
-    if (!name || !suggestion) {
-      alert('Please enter both your name and your suggestion.');
-      return;
-    }
-
-    const entry = { name, text: suggestion, time: new Date().toISOString() };
-
-    // Save to localStorage
-    const existing = JSON.parse(localStorage.getItem('suggestions') || '[]');
-    existing.push(entry);
-    localStorage.setItem('suggestions', JSON.stringify(existing));
-
-    // Send to Google Apps Script
-    fetch('https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec?action=addSuggestionToSheet', {
-      method: 'POST',
-      body: JSON.stringify(entry)
-    }).then(() => {
-      alert('Thanks for your suggestion!');
-      closeSuggestionModal();
-      document.getElementById('suggestion-name').value = '';
-      document.getElementById('suggestion-text').value = '';
-    });
+  if (!name || !suggestion) {
+    alert('Please enter both your name and your suggestion.');
+    return;
   }
+
+  const entry = { name, suggestion, time: new Date().toISOString() };
+
+  // Save to localStorage
+  const existing = JSON.parse(localStorage.getItem('suggestions') || '[]');
+  existing.push(entry);
+  localStorage.setItem('suggestions', JSON.stringify(existing));
+
+  // Send to Google Apps Script
+  fetch('https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(entry)
+  })
+  .then(response => response.json())
+  .then(data => {
+    alert('Thanks for your suggestion!');
+    closeSuggestionModal();
+    document.getElementById('suggestion-name').value = '';
+    document.getElementById('suggestion-text').value = '';
+  })
+  .catch(error => {
+    console.error('Error sending suggestion:', error);
+    alert('Failed to submit. Please try again later.');
+  });
+}
+
 
   loadGames();
   displayShoutout();
