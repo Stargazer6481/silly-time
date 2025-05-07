@@ -175,11 +175,11 @@
       }
     }
 
-    // Fetch shoutout and suggestions when the page loads
-    window.onload = function() {
+    // Wait for the DOM to be fully loaded before executing the functions
+    document.addEventListener('DOMContentLoaded', function () {
       fetchShoutout();
       fetchSuggestions();
-    };
+    });
   </script>
 
 </body>
