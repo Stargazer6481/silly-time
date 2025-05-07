@@ -9,14 +9,14 @@
   <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-firestore.js"></script>
+
 </head>
 <body>
   <h1>Chat App</h1>
 
-  <!-- Add your chat functionality below -->
-  
+  <!-- Sign-in button -->
   <button id="sign-in-btn">Sign In</button>
-  
+
   <script>
     // Firebase config (use your provided config here)
     const firebaseConfig = {
@@ -33,14 +33,17 @@
     const auth = firebase.auth(app);
     const firestore = firebase.firestore(app);
 
-    // Example: Sign in anonymously when the "Sign In" button is clicked
+    // Sign in anonymously when the "Sign In" button is clicked
     document.getElementById("sign-in-btn").addEventListener("click", function() {
+      console.log("Sign In Button Clicked");
       auth.signInAnonymously()
         .then(() => {
           console.log("User signed in anonymously");
+          alert("Signed in successfully");
         })
         .catch((error) => {
           console.log("Error signing in: ", error);
+          alert("Sign-in error: " + error.message);
         });
     });
   </script>
