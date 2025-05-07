@@ -136,15 +136,23 @@
       scroll-behavior: smooth;
     }
 
+    .username-container {
+      width: 100%;
+      padding: 10px;
+      background-color: #40444b;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
     .username-input {
       width: 100%;
       padding: 10px;
-      border-radius: 20px;
+      border-radius: 10px;
       font-size: 14px;
       background-color: #2a2f34;
       color: #dcddde;
       border: 1px solid #202225;
-      margin-bottom: 10px;
     }
   </style>
 </head>
@@ -157,9 +165,8 @@
   </div>
 
   <!-- Username Input -->
-  <div class="username-input">
-    <label for="username" style="color: #ffffff;">Enter Your Name:</label>
-    <input type="text" id="username" placeholder="Enter your username" />
+  <div class="username-container">
+    <input type="text" id="username" class="username-input" placeholder="Enter your username" />
   </div>
   
   <div class="messages" id="messages-container">
@@ -211,7 +218,7 @@
     async function sendMessage(messageText) {
       const username = document.getElementById("username").value;
 
-      if (username.trim() === "") {
+      if (!username.trim()) {
         alert("Please enter your username before sending a message.");
         return;
       }
@@ -257,28 +264,27 @@
         gifElement.innerHTML = `<img src="${gif.media[0].gif.url}" alt="GIF">`;
 
         gifElement.addEventListener('click', function() {
-          sendMessage(`<img src="${gif.media[0].gif.url}" alt="GIF" style="max-width: 200px; border-radius: 10px;">`);
-          document.getElementById('gif-gallery').style.display = 'none'; // Hide the GIF gallery after selecting a GIF
+          document.getElementById("chat-message").value += ' ' + gif.media[0].gif.url; // Add gif URL to message input
+          gallery.style.display = 'none'; // Hide the GIF gallery after selecting
         });
 
         gallery.appendChild(gifElement);
       });
-
-      document.getElementById('gif-gallery').style.display = 'flex';  // Show the gallery
     }
 
-    // Show GIFs on button click
-    document.getElementById("gif-button").addEventListener("click", function() {
-      const keyword = prompt("Enter a keyword for GIF search:");
-      if (keyword) {
-        fetchGIFs(keyword);  // Fetch GIFs based on the entered keyword
-      }
-    });
-
-    document.getElementById("send-button").addEventListener("click", function() {
+    // Event listeners for the send button and GIF button
+    document.getElementById('send-button').addEventListener('click', function() {
       const messageInput = document.getElementById("chat-message");
       sendMessage(messageInput.value);
       messageInput.value = ''; // Clear input after sending
+    });
+
+    document.getElementById('gif-button').addEventListener('click', function() {
+      const gifQuery = prompt("Enter a keyword for GIF search:");
+      if (gifQuery) {
+        document.getElementById("gif-gallery").style.display = 'flex';
+        fetchGIFs(gifQuery);
+      }
     });
 
     loadMessages();  // Initial load of messages
