@@ -34,12 +34,6 @@
       color: #ffffff;
     }
 
-    .user-name {
-      font-size: 18px;
-      color: #ffffff;
-      font-weight: bold;
-    }
-
     .messages {
       flex-grow: 1;
       overflow-y: auto;
@@ -141,6 +135,17 @@
     .messages {
       scroll-behavior: smooth;
     }
+
+    .username-input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 20px;
+      font-size: 14px;
+      background-color: #2a2f34;
+      color: #dcddde;
+      border: 1px solid #202225;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
@@ -151,9 +156,10 @@
     </div>
   </div>
 
-  <!-- User's Name -->
-  <div class="user-name" id="user-name">
-    User Name Here
+  <!-- Username Input -->
+  <div class="username-input">
+    <label for="username" style="color: #ffffff;">Enter Your Name:</label>
+    <input type="text" id="username" placeholder="Enter your username" />
   </div>
   
   <div class="messages" id="messages-container">
@@ -203,6 +209,13 @@
 
     // Function to send a message with word filtering
     async function sendMessage(messageText) {
+      const username = document.getElementById("username").value;
+
+      if (username.trim() === "") {
+        alert("Please enter your username before sending a message.");
+        return;
+      }
+
       if (messageText.trim() === "") return;
       
       // Check if the message contains blocked words
@@ -216,7 +229,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'addChatMessage',
-          name: 'User',
+          name: username,
           message: messageText
         })
       });
@@ -263,13 +276,12 @@
     });
 
     document.getElementById("send-button").addEventListener("click", function() {
-      const message = document.getElementById("chat-message").value;
-      sendMessage(message);
-      document.getElementById("chat-message").value = "";
+      const messageInput = document.getElementById("chat-message");
+      sendMessage(messageInput.value);
+      messageInput.value = ''; // Clear input after sending
     });
 
-    // Load messages when page loads
-    window.onload = loadMessages;
+    loadMessages();  // Initial load of messages
   </script>
 </body>
 </html>
