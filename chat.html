@@ -177,12 +177,22 @@
     // Wait for the DOM content to fully load before attaching events
     document.addEventListener('DOMContentLoaded', function() {
       // Add event listeners for buttons
-      document.getElementById('signUpButton').addEventListener('click', signUp);
-      document.getElementById('loginButton').addEventListener('click', login);
+      const signUpButton = document.getElementById('signUpButton');
+      const loginButton = document.getElementById('loginButton');
+
+      console.log("Button elements loaded", signUpButton, loginButton); // Debugging log
+
+      // Ensure buttons are clickable and have hover effect
+      signUpButton.style.cursor = 'pointer';
+      loginButton.style.cursor = 'pointer';
+
+      signUpButton.addEventListener('click', signUp);
+      loginButton.addEventListener('click', login);
     });
 
     // Sign Up Function
     async function signUp() {
+      console.log('Sign up clicked');
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
       const { error } = await supabase.auth.signUp({ email, password });
@@ -195,6 +205,7 @@
 
     // Login Function
     async function login() {
+      console.log('Login clicked');
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
       const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -206,72 +217,7 @@
       checkAuth();
     }
 
-    // Set Username Function (For logged-in users)
-    async function setUsername() {
-      const username = document.getElementById('username').value;
-      if (!username) return alert('Username is required');
-      const user = supabase.auth.user();
-
-      // Update username in Supabase
-      const { error } = await supabase
-        .from('profiles')
-        .upsert({ id: user.id, username })
-      if (error) alert(error.message);
-      else {
-        alert('Username set successfully!');
-        checkAuth();
-      }
-    }
-
-    // Fetch and display chat messages
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec';
-
-    function avatarLetter(name) {
-      return name ? name.trim()[0].toUpperCase() : '?';
-    }
-
-    async function fetchChat() {
-      const res = await fetch(`${SCRIPT_URL}?action=getChat`);
-      const data = await res.json();
-      const log = document.getElementById('chatLog');
-      log.innerHTML = '';
-      data.messages.forEach(m => {
-        const div = document.createElement('div');
-        div.className = 'chat-message';
-        div.innerHTML = `
-          <div class="avatar">${avatarLetter(m.name)}</div>
-          <div class="message-content">
-            <div class="message-name">${m.name}</div>
-            <div class="message-text">${m.text}</div>
-          </div>
-        `;
-        log.appendChild(div);
-      });
-      log.scrollTop = log.scrollHeight;
-    }
-
-    async function sendChat() {
-      const message = document.getElementById('chatText').value.trim();
-      if (!message) return alert('Message is required');
-
-      const user = supabase.auth.user();
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('username')
-        .eq('id', user.id)
-        .single();
-
-      const name = profile.username || 'Anonymous'; // If no username, use "Anonymous"
-
-      await fetch(`${SCRIPT_URL}?action=addChatMessage`, {
-        method: 'POST',
-        body: JSON.stringify({ name, message }),
-      });
-      document.getElementById('chatText').value = '';
-      fetchChat();
-    }
-
-    // Check authentication status and update UI
+    // Check authentication status
     async function checkAuth() {
       const session = supabase.auth.session();
       const authSection = document.getElementById('authSection');
@@ -289,7 +235,6 @@
           authSection.style.display = 'none';
           setUsernameSection.style.display = 'none';
           chatContainer.style.display = 'flex';
-          fetchChat();
         } else {
           authSection.style.display = 'none';
           setUsernameSection.style.display = 'block';
