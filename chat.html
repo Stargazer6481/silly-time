@@ -123,19 +123,27 @@
     </div>
   </div>
 
-  <script>
+
+
+  
+<!-- Put this in the <head> -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.8.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.8.1/firebase-firestore.js";
+  
     const firebaseConfig = {
       apiKey: "AIzaSyBkD0t99ruWdPQmaoM081qsWvxIqkZ0XSc",
       authDomain: "silly-time.firebaseapp.com",
       projectId: "silly-time",
       storageBucket: "silly-time.appspot.com",
       messagingSenderId: "348661962395",
-      appId: "1:348661962395:web:673beb30e80f2e11e4983e"
+      appId: "1:348661962395:web:673beb30e80f2e11e4983e",
     };
-
-    const app = firebase.initializeApp(firebaseConfig);
-    const messaging = firebase.messaging(app);
-    const db = firebase.firestore();
+  
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+  
+    window.db = db; // expose globally for inline script use
 
     function avatarLetter(name) {
       return name ? name.trim()[0].toUpperCase() : '?';
