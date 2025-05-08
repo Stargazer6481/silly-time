@@ -134,7 +134,7 @@
     }
   </style>
 </head>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
 <body>
   <!-- Auth Section (Visible for non-logged in users) -->
   <div id="authSection" class="auth-section">
@@ -164,16 +164,22 @@
     </div>
   </div>
 
+  <!-- Add Supabase Client Script here -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
   <script>
     // Initialize Supabase client
     const supabase = supabase.createClient(
-      'https://YOUR_PROJECT.supabase.co', // Your Supabase URL
-      'YOUR_PUBLIC_ANON_KEY' // Your Supabase Key
+      'https://wllbrhemaxmuocynkjvo.supabase.co', // Your Supabase URL
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsbGJyaGVtYXhtdW9jeW5ranZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY3MzcxMjUsImV4cCI6MjA2MjMxMzEyNX0.DWLlspYd4xsPbiFOiLmoe9pvaAF11HVPA2z_Bhs7cAw' // Your Supabase Key
     );
 
-    // Add event listeners for buttons
-    document.getElementById('signUpButton').addEventListener('click', signUp);
-    document.getElementById('loginButton').addEventListener('click', login);
+    // Wait for the DOM content to fully load before attaching events
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add event listeners for buttons
+      document.getElementById('signUpButton').addEventListener('click', signUp);
+      document.getElementById('loginButton').addEventListener('click', login);
+    });
 
     // Sign Up Function
     async function signUp() {
@@ -215,13 +221,6 @@
         alert('Username set successfully!');
         checkAuth();
       }
-    }
-
-    // Logout Function
-    async function logout() {
-      await supabase.auth.signOut();
-      alert('Logged out');
-      checkAuth();
     }
 
     // Fetch and display chat messages
