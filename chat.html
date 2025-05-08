@@ -137,6 +137,12 @@
       border-radius: 5px;
       cursor: pointer;
     }
+
+    #waiting {
+      color: #ffcc00;
+      font-size: 18px;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
@@ -150,6 +156,7 @@
 
   <div class="chat-container" style="display: none;">
     <div class="chat-header">💬 Chat Room</div>
+    <div id="waiting" style="display: none;">Waiting for verification...</div>
 
     <div id="chatLog" class="chat-log"></div>
 
@@ -162,60 +169,63 @@
 
   <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec';
+    let userName = '';
 
-    function avatarLetter(name) {
-      return name ? name.trim()[0].toUpperCase() : '?';
+    async function submitName() {
+      userName = document.getElementById('nameInput').value.trim();
+      if (!userName) return alert('Please enter your name!');
+
+      // Hide the name input and show waiting message
+      document.getElementById('namePrompt').style.display = 'none';
+      document.getElementById('waiting').style.display = 'block';
+
+      await fetch(`${SCRIPT_URL}?action=sendVerificationEmail&name=${userName}`);
+      
+      checkIfVerified();
     }
 
-    async function fetchChat() {
-      const res = await fetch(`${SCRIPT_URL}?action=getChat`);
-      const data = await res.json();
-      const log = document.getElementById('chatLog');
-      log.innerHTML = '';
-      data.messages.forEach(m => {
-        const
-        div = document.createElement('div');
-        div.classList.add('chat-message');
-        div.innerHTML = `<div>
-          <div class="avatar">${avatarLetter(m.name)}</div>
-          <div class="message-content">
-            <div class="message-name">${m.name}${m.verified ? '' : ' (Unverified)'}</div>
-            <div>${m.text}</div>
-          </div>
-        </div>`;
-      log.appendChild(div);
-    });
+    async function checkIfVerified() {
+      const res = await fetch(`${SCRIPT_URL}?action=check
+IfVerified&name=${userName}`);
+const isVerified = await res.text();
+if (isVerified === 'true') {
+    document.getElementById('waiting').style.display = 'none';
+    document.querySelector('.chat-container').style.display = 'block';
+    document.getElementById('chatName').value = userName;
+    document.getElementById('chatText').disabled = false;
+    document.querySelector('button').disabled = false;
+  } else {
+    setTimeout(checkIfVerified, 5000); // Check every 5 seconds
   }
-  async function checkVerification(name) {
-  const res = await fetch(`${SCRIPT_URL}?action=checkIfVerified&name=${name}`);
-  const verified = await res.text();
-  return verified === 'true';
 }
 
 async function sendChat() {
-  const name = document.getElementById('chatName').value;
-  const text = document.getElementById('chatText').value;
-  if (text && name) {
-    await fetch(`${SCRIPT_URL}?action=sendChat&name=${name}&text=${text}`);
-    document.getElementById('chatText').value = '';  // Clear input
-    fetchChat();  // Refresh chat
-  }
+  const message = document.getElementById('chatText').value.trim();
+  if (!message) return;
+
+  // Send the message to Google Sheets
+  await fetch(`${SCRIPT_URL}?action=addMessage&name=${userName}&text=${message}`);
+  document.getElementById('chatText').value = '';
+  updateChatLog();
 }
 
-async function submitName() {
-  const name = document.getElementById('nameInput').value;
-  if (!name) return;
+async function updateChatLog() {
+  const res = await fetch(`${SCRIPT_URL}?action=getChat`);
+  const data = await res.json();
 
-  const isVerified = await checkVerification(name);
-  if (!isVerified) {
-    alert('Please verify your account first!');
-    return;
-  }
+  const chatLog = document.getElementById('chatLog');
+  chatLog.innerHTML = '';
 
-  document.getElementById('namePrompt').style.display = 'none';
-  document.querySelector('.chat-container').style.display = 'block';
-  document.getElementById('chatName').value = name;
-  fetchChat();  // Load messages
+  data.messages.forEach(msg => {
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('chat-message');
+    messageElement.innerHTML = `<div class="avatar">${msg.name[0]}</div>
+                                <div class="message-content">
+                                  <div class="message-name">${msg.name}</div>
+                                  <div class="message-text">${msg.text}</div>
+                                </div>`;
+    chatLog.appendChild(messageElement);
+  });
 }
 </script>
 </body>
