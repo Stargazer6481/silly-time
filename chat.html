@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chat Room</title>
   <style>
     body {
@@ -14,25 +16,29 @@
       display: flex;
       flex-direction: column;
       height: 100vh;
+      max-width: 800px;
+      margin: 0 auto;
     }
 
     .chat-header {
       background-color: #202225;
       padding: 15px;
-      font-size: 20px;
+      font-size: 24px;
       font-weight: bold;
       color: white;
+      text-align: center;
       border-bottom: 1px solid #1e1f22;
     }
 
     .chat-log {
       flex-grow: 1;
       overflow-y: auto;
-      padding: 15px;
+      padding: 20px;
+      border-bottom: 1px solid #1e1f22;
     }
 
     .chat-message {
-      margin-bottom: 15px;
+      margin-bottom: 20px;
       display: flex;
       align-items: flex-start;
     }
@@ -66,9 +72,11 @@
 
     .chat-input {
       display: flex;
-      padding: 10px;
+      padding: 15px;
       background-color: #40444b;
       border-top: 1px solid #1e1f22;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .chat-input input, .chat-input textarea {
@@ -82,7 +90,7 @@
     }
 
     .chat-input input {
-      width: 150px;
+      width: 180px;
     }
 
     .chat-input textarea {
@@ -95,160 +103,164 @@
       background-color: #7289da;
       color: white;
       border: none;
-      padding: 10px 15px;
+      padding: 10px 20px;
       border-radius: 5px;
       cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
     }
 
     .chat-input button:hover {
       background-color: #5b6eae;
     }
 
-    .auth-section {
-      padding: 15px;
-      background-color: #202225;
-      color: white;
-      text-align: center;
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      background-color: #2f3136;
+      border-radius: 10px;
     }
 
-    .auth-section input {
+    .login-form input {
       padding: 10px;
-      margin: 5px;
+      margin-bottom: 10px;
+      border: 1px solid #444;
       border-radius: 5px;
+      background-color: #303339;
+      color: #dcddde;
     }
 
-    .auth-section button {
-      padding: 10px 15px;
-      margin-top: 10px;
+    .login-form button {
+      padding: 10px;
       background-color: #7289da;
       color: white;
       border: none;
       border-radius: 5px;
+      cursor: pointer;
     }
 
-    .set-username-section {
-      padding: 15px;
-      background-color: #202225;
-      color: white;
-      text-align: center;
+    .login-form button:hover {
+      background-color: #5b6eae;
     }
   </style>
 </head>
-
 <body>
-  <!-- Auth Section (Visible for non-logged in users) -->
-  <div id="authSection" class="auth-section">
-    <h2>Sign Up</h2>
-    <input id="email" placeholder="Email" type="email" />
-    <input id="password" placeholder="Password" type="password" />
-    <button id="signUpButton">Sign Up</button>
-    <h2>Login</h2>
-    <button id="loginButton">Login</button>
-  </div>
-
-  <!-- Set Username Section (Visible for logged-in users who haven't set their username yet) -->
-  <div id="setUsernameSection" class="set-username-section" style="display: none;">
-    <h2>Set Your Username</h2>
-    <input id="username" placeholder="Enter your username" />
-    <button onclick="setUsername()">Set Username</button>
-  </div>
-
-  <!-- Chat Section (Visible for logged-in users with username) -->
-  <div id="chatContainer" class="chat-container" style="display: none;">
+  <div class="chat-container">
     <div class="chat-header">💬 Chat Room</div>
     <div id="chatLog" class="chat-log"></div>
 
     <div class="chat-input">
+      <input id="chatName" placeholder="Your name" />
       <textarea id="chatText" placeholder="Say something..."></textarea>
       <button onclick="sendChat()">Send</button>
     </div>
+
+    <!-- Login form (hidden by default) -->
+    <div class="login-form" id="loginForm" style="display: none;">
+      <input type="email" id="loginEmail" placeholder="Enter your email" />
+      <input type="password" id="loginPassword" placeholder="Enter your password" />
+      <button onclick="login()">Login</button>
+      <button onclick="signUp()">Sign Up</button>
+    </div>
   </div>
 
-  <!-- Add Supabase Client Script here -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
   <script>
-    // Initialize Supabase client
     const supabase = supabase.createClient(
-      'https://wllbrhemaxmuocynkjvo.supabase.co', // Your Supabase URL
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsbGJyaGVtYXhtdW9jeW5ranZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY3MzcxMjUsImV4cCI6MjA2MjMxMzEyNX0.DWLlspYd4xsPbiFOiLmoe9pvaAF11HVPA2z_Bhs7cAw' // Your Supabase Key
+      'https://wllbrhemaxmuocynkjvo.supabase.co',
+      'your-public-anon-key' // Replace with your actual key
     );
 
-    // Wait for the DOM content to fully load before attaching events
-    document.addEventListener('DOMContentLoaded', function() {
-      // Add event listeners for buttons
-      const signUpButton = document.getElementById('signUpButton');
-      const loginButton = document.getElementById('loginButton');
+    let user;
 
-      console.log("Button elements loaded", signUpButton, loginButton); // Debugging log
+    // Fetch the current user
+    async function getCurrentUser() {
+      user = supabase.auth.user();
+      if (!user) {
+        document.getElementById('loginForm').style.display = 'block';
+      }
+    }
 
-      // Ensure buttons are clickable and have hover effect
-      signUpButton.style.cursor = 'pointer';
-      loginButton.style.cursor = 'pointer';
+    // Display chat messages
+    async function fetchChat() {
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .order('created_at', { ascending: true });
 
-      signUpButton.addEventListener('click', signUp);
-      loginButton.addEventListener('click', login);
-    });
+      if (error) {
+        console.error(error);
+        return;
+      }
 
-    // Sign Up Function
+      const chatLog = document.getElementById('chatLog');
+      chatLog.innerHTML = '';
+      data.forEach((message) => {
+        const div = document.createElement('div');
+        div.className = 'chat-message';
+        div.innerHTML = `
+          <div class="avatar">${message.username[0].toUpperCase()}</div>
+          <div class="message-content">
+            <div class="message-name">${message.username}</div>
+            <div class="message-text">${message.text}</div>
+          </div>
+        `;
+        chatLog.appendChild(div);
+      });
+    }
+
+    // Send a new chat message
+    async function sendChat() {
+      const name = document.getElementById('chatName').value.trim();
+      const message = document.getElementById('chatText').value.trim();
+      if (!name || !message) return alert('Both name and message are required');
+
+      const { data, error } = await supabase.from('messages').insert([
+        {
+          username: name,
+          text: message,
+        },
+      ]);
+
+      if (error) {
+        console.error(error);
+      } else {
+        document.getElementById('chatText').value = '';
+        fetchChat();
+      }
+    }
+
+    // Sign up function
     async function signUp() {
-      console.log('Sign up clicked');
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const { error } = await supabase.auth.signUp({ email, password });
-      if (error) {
-        alert(error.message);
-      } else {
-        alert('Check your email for verification');
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+
+      const { user, error } = await supabase.auth.signUp({ email, password });
+      if (error) console.error(error.message);
+      else {
+        alert('Sign Up successful!');
+        getCurrentUser();
       }
     }
 
-    // Login Function
+    // Login function
     async function login() {
-      console.log('Login clicked');
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        alert(error.message);
-      } else {
-        alert('Logged in');
-      }
-      checkAuth();
-    }
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
 
-    // Check authentication status
-    async function checkAuth() {
-      const session = supabase.auth.session();
-      const authSection = document.getElementById('authSection');
-      const chatContainer = document.getElementById('chatContainer');
-      const setUsernameSection = document.getElementById('setUsernameSection');
-
-      if (session) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('username')
-          .eq('id', session.user.id)
-          .single();
-
-        if (profile && profile.username) {
-          authSection.style.display = 'none';
-          setUsernameSection.style.display = 'none';
-          chatContainer.style.display = 'flex';
-        } else {
-          authSection.style.display = 'none';
-          setUsernameSection.style.display = 'block';
-          chatContainer.style.display = 'none';
-        }
-      } else {
-        authSection.style.display = 'block';
-        setUsernameSection.style.display = 'none';
-        chatContainer.style.display = 'none';
+      const { user, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) console.error(error.message);
+      else {
+        alert('Login successful!');
+        getCurrentUser();
       }
     }
 
-    // Call checkAuth() on load to set up the UI correctly
-    window.onload = checkAuth;
+    // Initialize chat and check login status
+    fetchChat();
+    setInterval(fetchChat, 5000);
+    getCurrentUser();
   </script>
 </body>
 </html>
