@@ -141,9 +141,9 @@
     <h2>Sign Up</h2>
     <input id="email" placeholder="Email" type="email" />
     <input id="password" placeholder="Password" type="password" />
-    <button onclick="signUp()">Sign Up</button>
+    <button id="signUpButton">Sign Up</button>
     <h2>Login</h2>
-    <button onclick="login()">Login</button>
+    <button id="loginButton">Login</button>
   </div>
 
   <!-- Set Username Section (Visible for logged-in users who haven't set their username yet) -->
@@ -167,17 +167,24 @@
   <script>
     // Initialize Supabase client
     const supabase = supabase.createClient(
-      'https://YOUR_PROJECT.supabase.co',
-      'YOUR_PUBLIC_ANON_KEY'
+      'https://YOUR_PROJECT.supabase.co', // Your Supabase URL
+      'YOUR_PUBLIC_ANON_KEY' // Your Supabase Key
     );
+
+    // Add event listeners for buttons
+    document.getElementById('signUpButton').addEventListener('click', signUp);
+    document.getElementById('loginButton').addEventListener('click', login);
 
     // Sign Up Function
     async function signUp() {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
       const { error } = await supabase.auth.signUp({ email, password });
-      if (error) alert(error.message);
-      else alert('Check your email for verification');
+      if (error) {
+        alert(error.message);
+      } else {
+        alert('Check your email for verification');
+      }
     }
 
     // Login Function
@@ -185,8 +192,12 @@
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) alert(error.message);
-      else alert('Logged in');
+      if (error) {
+        alert(error.message);
+      } else {
+        alert('Logged in');
+      }
+      checkAuth();
     }
 
     // Set Username Function (For logged-in users)
@@ -265,32 +276,35 @@
     async function checkAuth() {
       const session = supabase.auth.session();
       const authSection = document.getElementById('authSection');
-      const chatContainer = document.getElementById
-      ('chatContainer');
+      const chatContainer = document.getElementById('chatContainer');
       const setUsernameSection = document.getElementById('setUsernameSection');
+
       if (session) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('username')
-      .eq('id', session.user.id)
-      .single();
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('username')
+          .eq('id', session.user.id)
+          .single();
 
-    if (profile && profile.username) {
-      authSection.style.display = 'none';
-      setUsernameSection.style.display = 'none';
-      chatContainer.style.display = 'flex';
-      fetchChat();
-    } else {
-      authSection.style.display = 'none';
-      setUsernameSection.style.display = 'block';
-      chatContainer.style.display = 'none';
+        if (profile && profile.username) {
+          authSection.style.display = 'none';
+          setUsernameSection.style.display = 'none';
+          chatContainer.style.display = 'flex';
+          fetchChat();
+        } else {
+          authSection.style.display = 'none';
+          setUsernameSection.style.display = 'block';
+          chatContainer.style.display = 'none';
+        }
+      } else {
+        authSection.style.display = 'block';
+        setUsernameSection.style.display = 'none';
+        chatContainer.style.display = 'none';
+      }
     }
-  } else {
-    authSection.style.display = 'block';
-    setUsernameSection.style.display = 'none';
-    chatContainer.style.display = 'none';
-  }
-}
 
-// Call checkAuth() on load to set up the UI correctly
-window.onload = checkAuth;
+    // Call checkAuth() on load to set up the UI correctly
+    window.onload = checkAuth;
+  </script>
+</body>
+</html>
