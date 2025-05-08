@@ -1,162 +1,67 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Chat Room</title>
+  <title>Silly Time Chat</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <style>
     body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
       margin: 0;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #2f3136;
-      color: #dcddde;
+      padding: 20px;
     }
+
     .chat-container {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-    .chat-header {
-      background-color: #202225;
-      padding: 15px;
-      font-size: 20px;
-      font-weight: bold;
-      color: white;
-      border-bottom: 1px solid #1e1f22;
-    }
-    .chat-log {
-      flex-grow: 1;
-      overflow-y: auto;
-      padding: 15px;
-    }
-    .chat-message {
-      margin-bottom: 15px;
-      display: flex;
-      align-items: flex-start;
-    }
-    .avatar {
-      width: 40px;
-      height: 40px;
-      background-color: #7289da;
-      border-radius: 50%;
-      margin-right: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      color: white;
-      font-size: 18px;
-    }
-    .message-content {
-      background-color: #36393f;
-      padding: 10px 15px;
+      max-width: 500px;
+      margin: auto;
+      background: white;
       border-radius: 10px;
-      max-width: 600px;
+      padding: 15px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
-    .message-name {
-      font-weight: bold;
-      margin-bottom: 5px;
-      color: #ffffff;
+
+    .chat-header {
+      font-size: 24px;
+      margin-bottom: 10px;
     }
-    .chat-input {
-      display: flex;
+
+    .chat-log {
+      height: 300px;
+      overflow-y: scroll;
+      border: 1px solid #ddd;
       padding: 10px;
-      background-color: #40444b;
-      border-top: 1px solid #1e1f22;
+      margin-bottom: 10px;
     }
-    .chat-input input, .chat-input textarea {
-      background-color: #303339;
-      color: #dcddde;
-      border: none;
-      padding: 10px;
-      border-radius: 5px;
-      font-size: 14px;
-      margin-right: 10px;
+
+    .chat-message {
+      margin-bottom: 8px;
     }
-    .chat-input input {
-      width: 150px;
+
+    .chat-message strong {
+      color: #333;
     }
+
+    .chat-input input,
     .chat-input textarea {
-      flex-grow: 1;
-      resize: none;
-      height: 50px;
+      width: 100%;
+      margin-bottom: 5px;
+      padding: 10px;
+      font-size: 14px;
+      box-sizing: border-box;
     }
+
     .chat-input button {
-      background-color: #7289da;
+      width: 100%;
+      padding: 10px;
+      background: #007bff;
       color: white;
       border: none;
-      padding: 10px 15px;
-      border-radius: 5px;
+      font-size: 16px;
       cursor: pointer;
-    }
-    .chat-input button:hover {
-      background-color: #5b6eae;
+      border-radius: 4px;
     }
   </style>
-
-  <!-- Firebase v8 SDK -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBkD0t99ruWdPQmaoM081qsWvxIqkZ0XSc",
-      authDomain: "silly-time.firebaseapp.com",
-      projectId: "silly-time",
-      storageBucket: "silly-time.appspot.com",
-      messagingSenderId: "348661962395",
-      appId: "1:348661962395:web:673beb30e80f2e11e4983e"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec';
-
-    function avatarLetter(name) {
-      return name ? name.trim()[0].toUpperCase() : '?';
-    }
-
-    async function fetchChat() {
-      const res = await fetch(`${SCRIPT_URL}?action=getChat`);
-      const data = await res.json();
-      const log = document.getElementById('chatLog');
-      log.innerHTML = '';
-      data.messages.forEach(m => {
-        const div = document.createElement('div');
-        div.className = 'chat-message';
-        div.innerHTML = `
-          <div class="avatar">${avatarLetter(m.name)}</div>
-          <div class="message-content">
-            <div class="message-name">${m.name}</div>
-            <div class="message-text">${m.text}</div>
-          </div>
-        `;
-        log.appendChild(div);
-      });
-      log.scrollTop = log.scrollHeight;
-    }
-
-    async function sendChat() {
-      const name = document.getElementById('nameInput').value.trim();
-      const text = document.getElementById('textInput').value.trim();
-      if (!name || !text) return;
-
-      const payload = new URLSearchParams();
-      payload.append('action', 'addChat');
-      payload.append('name', name);
-      payload.append('text', text);
-
-      await fetch(SCRIPT_URL, {
-        method: 'POST',
-        body: payload
-      });
-
-      document.getElementById('textInput').value = '';
-      fetchChat();
-    }
-
-    setInterval(fetchChat, 3000); // Auto-refresh every 3 seconds
-    window.onload = fetchChat;
-  </script>
 </head>
 <body>
   <div class="chat-container">
@@ -168,5 +73,52 @@
       <button onclick="sendChat()">Send</button>
     </div>
   </div>
+
+  <script>
+    // Replace with your Firebase config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const chatCollection = db.collection("chatMessages");
+
+    async function sendChat() {
+      const name = document.getElementById("nameInput").value.trim();
+      const text = document.getElementById("textInput").value.trim();
+      if (!name || !text) return;
+
+      await chatCollection.add({
+        name: name,
+        text: text,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      document.getElementById("textInput").value = "";
+    }
+
+    function fetchChat() {
+      chatCollection.orderBy("timestamp", "asc").limit(100).onSnapshot(snapshot => {
+        const chatLog = document.getElementById("chatLog");
+        chatLog.innerHTML = "";
+        snapshot.forEach(doc => {
+          const msg = doc.data();
+          const div = document.createElement("div");
+          div.className = "chat-message";
+          div.innerHTML = `<strong>${msg.name}:</strong> ${msg.text}`;
+          chatLog.appendChild(div);
+        });
+        chatLog.scrollTop = chatLog.scrollHeight;
+      });
+    }
+
+    window.onload = fetchChat;
+  </script>
 </body>
 </html>
