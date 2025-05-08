@@ -125,6 +125,13 @@
       border: none;
       border-radius: 5px;
     }
+
+    .set-username-section {
+      padding: 15px;
+      background-color: #202225;
+      color: white;
+      text-align: center;
+    }
   </style>
 </head>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
@@ -139,13 +146,19 @@
     <button onclick="login()">Login</button>
   </div>
 
-  <!-- Chat Section (Visible for logged-in users) -->
+  <!-- Set Username Section (Visible for logged-in users who haven't set their username yet) -->
+  <div id="setUsernameSection" class="set-username-section" style="display: none;">
+    <h2>Set Your Username</h2>
+    <input id="username" placeholder="Enter your username" />
+    <button onclick="setUsername()">Set Username</button>
+  </div>
+
+  <!-- Chat Section (Visible for logged-in users with username) -->
   <div id="chatContainer" class="chat-container" style="display: none;">
     <div class="chat-header">💬 Chat Room</div>
     <div id="chatLog" class="chat-log"></div>
 
     <div class="chat-input">
-      <input id="chatName" placeholder="Your name" />
       <textarea id="chatText" placeholder="Say something..."></textarea>
       <button onclick="sendChat()">Send</button>
     </div>
@@ -176,10 +189,28 @@
       else alert('Logged in');
     }
 
+    // Set Username Function (For logged-in users)
+    async function setUsername() {
+      const username = document.getElementById('username').value;
+      if (!username) return alert('Username is required');
+      const user = supabase.auth.user();
+
+      // Update username in Supabase
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({ id: user.id, username })
+      if (error) alert(error.message);
+      else {
+        alert('Username set successfully!');
+        checkAuth();
+      }
+    }
+
     // Logout Function
     async function logout() {
       await supabase.auth.signOut();
       alert('Logged out');
+      checkAuth();
     }
 
     // Fetch and display chat messages
@@ -210,9 +241,17 @@
     }
 
     async function sendChat() {
-      const name = document.getElementById('chatName').value.trim();
       const message = document.getElementById('chatText').value.trim();
-      if (!name || !message) return alert('Both name and message required');
+      if (!message) return alert('Message is required');
+
+      const user = supabase.auth.user();
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', user.id)
+        .single();
+
+      const name = profile.username || 'Anonymous'; // If no username, use "Anonymous"
 
       await fetch(`${SCRIPT_URL}?action=addChatMessage`, {
         method: 'POST',
@@ -222,22 +261,36 @@
       fetchChat();
     }
 
-    // Check authentication status
-    supabase.auth.onAuthStateChange((event, session) => {
+    // Check authentication status and update UI
+    async function checkAuth() {
+      const session = supabase.auth.session();
       const authSection = document.getElementById('authSection');
-      const chatContainer = document.getElementById('chatContainer');
+      const chatContainer = document.getElementById
+      ('chatContainer');
+      const setUsernameSection = document.getElementById('setUsernameSection');
       if (session) {
-        authSection.style.display = 'none';
-        chatContainer.style.display = 'flex';
-        fetchChat();
-        setInterval(fetchChat, 4000); // Keep fetching chat every 4 seconds
-      } else {
-        authSection.style.display = 'block';
-        chatContainer.style.display = 'none';
-      }
-    });
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('id', session.user.id)
+      .single();
 
-    fetchChat();
-  </script>
-</body>
-</html>
+    if (profile && profile.username) {
+      authSection.style.display = 'none';
+      setUsernameSection.style.display = 'none';
+      chatContainer.style.display = 'flex';
+      fetchChat();
+    } else {
+      authSection.style.display = 'none';
+      setUsernameSection.style.display = 'block';
+      chatContainer.style.display = 'none';
+    }
+  } else {
+    authSection.style.display = 'block';
+    setUsernameSection.style.display = 'none';
+    chatContainer.style.display = 'none';
+  }
+}
+
+// Call checkAuth() on load to set up the UI correctly
+window.onload = checkAuth;
