@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Chat Room</title>
+  <title>Kyle's DCE MS Chat</title>
   <style>
-        body {
+    body {
       margin: 0;
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       background-color: #2f3136;
@@ -107,19 +107,11 @@
 </head>
 <body>
   <div class="chat-container">
-    <div class="chat-header">💬 Chat Room</div>
+    <div class="chat-header">Kyle's Chat Room</div>
 
     <div id="chatLog" class="chat-log"></div>
 
-    <!-- Email and Code Inputs -->
-    <div id="emailVerification">
-      <input id="userEmail" placeholder="Enter your email" />
-      <input id="verificationCode" placeholder="Enter your verification code" />
-      <button onclick="verifyUser()">Verify</button>
-    </div>
-
-    <!-- Chat Input Section -->
-    <div id="chatInputSection" style="display:none;">
+    <div class="chat-input">
       <input id="chatName" placeholder="Your name" />
       <textarea id="chatText" placeholder="Say something..."></textarea>
       <button onclick="sendChat()">Send</button>
@@ -127,28 +119,12 @@
   </div>
 
   <script>
-    const SCRIPT_URL = 'Yhttps://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/execOUR_GOOGLE_APPS_SCRIPT_URL'; // Replace with your Google Apps Script URL
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec';
 
-    // Step 1: Verify the email and code
-    async function verifyUser() {
-      const email = document.getElementById('userEmail').value.trim();
-      const code = document.getElementById('verificationCode').value.trim();
-      if (!email || !code) return alert('Both email and code are required.');
-
-      const res = await fetch(`${SCRIPT_URL}?action=verifyCode&email=${email}&code=${code}`);
-      const data = await res.json();
-
-      if (data.success) {
-        alert('Email verified! You can now chat.');
-        document.getElementById('emailVerification').style.display = 'none';
-        document.getElementById('chatInputSection').style.display = 'block';
-        fetchChat(); // Load the chat messages once verified
-      } else {
-        alert('Invalid email or code! Please try again.');
-      }
+    function avatarLetter(name) {
+      return name ? name.trim()[0].toUpperCase() : '?';
     }
 
-    // Step 2: Fetch chat messages
     async function fetchChat() {
       const res = await fetch(`${SCRIPT_URL}?action=getChat`);
       const data = await res.json();
@@ -158,11 +134,10 @@
         const div = document.createElement('div');
         div.className = 'chat-message';
         div.innerHTML = `
-          <div class="avatar">${m.name[0].toUpperCase()}</div>
+          <div class="avatar">${avatarLetter(m.name)}</div>
           <div class="message-content">
             <div class="message-name">${m.name}</div>
-            <div class="message-text">${m.message}</div>
-            <div class="message-timestamp">${new Date(m.timestamp).toLocaleString()}</div>
+            <div class="message-text">${m.text}</div>
           </div>
         `;
         log.appendChild(div);
@@ -170,7 +145,6 @@
       log.scrollTop = log.scrollHeight;
     }
 
-    // Step 3: Send chat messages
     async function sendChat() {
       const name = document.getElementById('chatName').value.trim();
       const message = document.getElementById('chatText').value.trim();
@@ -183,6 +157,9 @@
       document.getElementById('chatText').value = '';
       fetchChat();
     }
+
+    fetchChat();
+    setInterval(fetchChat, 4000);
   </script>
 </body>
 </html>
