@@ -154,9 +154,9 @@
     <div id="chatLog" class="chat-log"></div>
 
     <div class="chat-input">
-      <input id="chatName" placeholder="Your name" />
-      <textarea id="chatText" placeholder="Say something..."></textarea>
-      <button onclick="sendChat()">Send</button>
+      <input id="chatName" placeholder="Your name" disabled />
+      <textarea id="chatText" placeholder="Say something..." disabled></textarea>
+      <button onclick="sendChat()" disabled>Send</button>
     </div>
   </div>
 
@@ -173,48 +173,51 @@
       const log = document.getElementById('chatLog');
       log.innerHTML = '';
       data.messages.forEach(m => {
-        const div = document.createElement('div');
-        div.className = 'chat-message';
-        div.innerHTML = `
+        const
+        div = document.createElement('div');
+        div.classList.add('chat-message');
+        div.innerHTML = `<div>
           <div class="avatar">${avatarLetter(m.name)}</div>
           <div class="message-content">
-            <div class="message-name">${m.name}</div>
-            <div class="message-text">${m.text}</div>
+            <div class="message-name">${m.name}${m.verified ? '' : ' (Unverified)'}</div>
+            <div>${m.text}</div>
           </div>
-        `;
-        log.appendChild(div);
-      });
-      log.scrollTop = log.scrollHeight;
-    }
+        </div>`;
+      log.appendChild(div);
+    });
+  }
+  async function checkVerification(name) {
+  const res = await fetch(`${SCRIPT_URL}?action=checkIfVerified&name=${name}`);
+  const verified = await res.text();
+  return verified === 'true';
+}
 
-    async function sendChat() {
-      const name = document.getElementById('chatName').value.trim();
-      const message = document.getElementById('chatText').value.trim();
-      if (!name || !message) return alert('Both name and message required');
+async function sendChat() {
+  const name = document.getElementById('chatName').value;
+  const text = document.getElementById('chatText').value;
+  if (text && name) {
+    await fetch(`${SCRIPT_URL}?action=sendChat&name=${name}&text=${text}`);
+    document.getElementById('chatText').value = '';  // Clear input
+    fetchChat();  // Refresh chat
+  }
+}
 
-      await fetch(`${SCRIPT_URL}?action=addChatMessage`, {
-        method: 'POST',
-        body: JSON.stringify({ name, message }),
-      });
-      document.getElementById('chatText').value = '';
-      fetchChat();
-    }
+async function submitName() {
+  const name = document.getElementById('nameInput').value;
+  if (!name) return;
 
-    async function submitName() {
-      const name = document.getElementById('nameInput').value.trim();
-      if (!name) return alert('Please enter your name.');
+  const isVerified = await checkVerification(name);
+  if (!isVerified) {
+    alert('Please verify your account first!');
+    return;
+  }
 
-      // Send the name to the backend to trigger the verification email
-      await fetch(`${SCRIPT_URL}?action=sendVerificationEmail&name=${name}`);
-
-      // Hide the name prompt and show the chat
-      document.getElementById('namePrompt').style.display = 'none';
-      document.querySelector('.chat-container').style.display = 'flex';
-      document.getElementById('chatName').value = name;
-
-      fetchChat();
-      setInterval(fetchChat, 4000);
-    }
-  </script>
+  document.getElementById('namePrompt').style.display = 'none';
+  document.querySelector('.chat-container').style.display = 'block';
+  document.getElementById('chatName').value = name;
+  fetchChat();  // Load messages
+}
+</script>
 </body>
 </html>
+```
