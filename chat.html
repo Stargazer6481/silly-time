@@ -1,124 +1,151 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Silly Time Chat</title>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f7f7f7;
-      margin: 0;
-      padding: 20px;
-    }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discord-style Chat</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    .chat-container {
-      max-width: 500px;
-      margin: auto;
-      background: white;
-      border-radius: 10px;
-      padding: 15px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .chat-header {
-      font-size: 24px;
-      margin-bottom: 10px;
-    }
-
-    .chat-log {
-      height: 300px;
-      overflow-y: scroll;
-      border: 1px solid #ddd;
-      padding: 10px;
-      margin-bottom: 10px;
-    }
-
-    .chat-message {
-      margin-bottom: 8px;
-    }
-
-    .chat-message strong {
-      color: #333;
-    }
-
-    .chat-input input,
-    .chat-input textarea {
-      width: 100%;
-      margin-bottom: 5px;
-      padding: 10px;
-      font-size: 14px;
-      box-sizing: border-box;
-    }
-
-    .chat-input button {
-      width: 100%;
-      padding: 10px;
-      background: #007bff;
-      color: white;
-      border: none;
-      font-size: 16px;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-  </style>
-</head>
-<body>
-  <div class="chat-container">
-    <div class="chat-header">Silly Time Chat</div>
-    <div class="chat-log" id="chatLog"></div>
-    <div class="chat-input">
-      <input id="nameInput" placeholder="Your name" />
-      <textarea id="textInput" placeholder="Type your message..."></textarea>
-      <button onclick="sendChat()">Send</button>
-    </div>
-  </div>
-
-  <script>
-    // Replace with your Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyBkD0t99ruWdPQmaoM081qsWvxIqkZ0XSc",
       authDomain: "silly-time.firebaseapp.com",
       projectId: "silly-time",
-      storageBucket: "silly-time.appspot.com",
+      storageBucket: "silly-time.firebasestorage.app",
       messagingSenderId: "348661962395",
       appId: "1:348661962395:web:673beb30e80f2e11e4983e"
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const chatCollection = db.collection("chatMessages");
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const messagesRef = collection(db, "messages");
 
     async function sendChat() {
-      const name = document.getElementById("nameInput").value.trim();
-      const text = document.getElementById("textInput").value.trim();
-      if (!name || !text) return;
+      const username = document.getElementById("username").value.trim();
+      const message = document.getElementById("message").value.trim();
+      if (!username || !message) return;
 
-      await chatCollection.add({
-        name: name,
-        text: text,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      await addDoc(messagesRef, {
+        username,
+        message,
+        timestamp: Date.now()
       });
 
-      document.getElementById("textInput").value = "";
+      document.getElementById("message").value = "";
+      fetchChat();
     }
 
-    function fetchChat() {
-      chatCollection.orderBy("timestamp", "asc").limit(100).onSnapshot(snapshot => {
-        const chatLog = document.getElementById("chatLog");
-        chatLog.innerHTML = "";
-        snapshot.forEach(doc => {
-          const msg = doc.data();
-          const div = document.createElement("div");
-          div.className = "chat-message";
-          div.innerHTML = `<strong>${msg.name}:</strong> ${msg.text}`;
-          chatLog.appendChild(div);
-        });
-        chatLog.scrollTop = chatLog.scrollHeight;
+    async function fetchChat() {
+      const q = query(messagesRef, orderBy("timestamp"));
+      const querySnapshot = await getDocs(q);
+
+      const messagesDiv = document.getElementById("messages");
+      messagesDiv.innerHTML = "";
+
+      querySnapshot.forEach(doc => {
+        const { username, message, timestamp } = doc.data();
+        const date = new Date(timestamp);
+        const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const msgEl = document.createElement("div");
+        msgEl.className = "message";
+        msgEl.innerHTML = `<span class="username">${username}</span><span class="timestamp">${timeStr}</span><div class="text">${message}</div>`;
+        messagesDiv.appendChild(msgEl);
       });
+
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
 
+    document.getElementById("send").addEventListener("click", sendChat);
     window.onload = fetchChat;
   </script>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background-color: #2c2f33;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    #chat-container {
+      width: 500px;
+      height: 600px;
+      background-color: #23272a;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+    }
+
+    .message {
+      margin-bottom: 12px;
+    }
+
+    .username {
+      color: #7289da;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+
+    .timestamp {
+      color: #888;
+      font-size: 0.85em;
+    }
+
+    .text {
+      margin-left: 5px;
+    }
+
+    #chat-input {
+      padding: 10px;
+      display: flex;
+      background-color: #2c2f33;
+      border-top: 1px solid #444;
+    }
+
+    #chat-input input {
+      margin-right: 10px;
+      padding: 8px;
+      border-radius: 5px;
+      border: none;
+    }
+
+    #chat-input input#username {
+      width: 100px;
+    }
+
+    #chat-input input#message {
+      flex: 1;
+    }
+
+    #chat-input button {
+      padding: 8px 12px;
+      background-color: #7289da;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="chat-container">
+    <div id="messages"></div>
+    <div id="chat-input">
+      <input type="text" id="username" placeholder="Your name">
+      <input type="text" id="message" placeholder="Type a message">
+      <button id="send">Send</button>
+    </div>
+  </div>
 </body>
 </html>
