@@ -103,12 +103,45 @@
     .chat-input button:hover {
       background-color: #5b6eae;
     }
+
+    .auth-section {
+      padding: 15px;
+      background-color: #202225;
+      color: white;
+      text-align: center;
+    }
+
+    .auth-section input {
+      padding: 10px;
+      margin: 5px;
+      border-radius: 5px;
+    }
+
+    .auth-section button {
+      padding: 10px 15px;
+      margin-top: 10px;
+      background-color: #7289da;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
   </style>
 </head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <body>
-  <div class="chat-container">
-    <div class="chat-header">💬 Chat Room</div>
+  <!-- Auth Section (Visible for non-logged in users) -->
+  <div id="authSection" class="auth-section">
+    <h2>Sign Up</h2>
+    <input id="email" placeholder="Email" type="email" />
+    <input id="password" placeholder="Password" type="password" />
+    <button onclick="signUp()">Sign Up</button>
+    <h2>Login</h2>
+    <button onclick="login()">Login</button>
+  </div>
 
+  <!-- Chat Section (Visible for logged-in users) -->
+  <div id="chatContainer" class="chat-container" style="display: none;">
+    <div class="chat-header">💬 Chat Room</div>
     <div id="chatLog" class="chat-log"></div>
 
     <div class="chat-input">
@@ -119,6 +152,37 @@
   </div>
 
   <script>
+    // Initialize Supabase client
+    const supabase = supabase.createClient(
+      'https://YOUR_PROJECT.supabase.co',
+      'YOUR_PUBLIC_ANON_KEY'
+    );
+
+    // Sign Up Function
+    async function signUp() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const { error } = await supabase.auth.signUp({ email, password });
+      if (error) alert(error.message);
+      else alert('Check your email for verification');
+    }
+
+    // Login Function
+    async function login() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) alert(error.message);
+      else alert('Logged in');
+    }
+
+    // Logout Function
+    async function logout() {
+      await supabase.auth.signOut();
+      alert('Logged out');
+    }
+
+    // Fetch and display chat messages
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwLImmugDLVGkErhrIqiZPX6pym7v6EQJQwd7tqcz6hV1ha41Cs9mvHagO5RSmfKxjf/exec';
 
     function avatarLetter(name) {
@@ -158,8 +222,22 @@
       fetchChat();
     }
 
+    // Check authentication status
+    supabase.auth.onAuthStateChange((event, session) => {
+      const authSection = document.getElementById('authSection');
+      const chatContainer = document.getElementById('chatContainer');
+      if (session) {
+        authSection.style.display = 'none';
+        chatContainer.style.display = 'flex';
+        fetchChat();
+        setInterval(fetchChat, 4000); // Keep fetching chat every 4 seconds
+      } else {
+        authSection.style.display = 'block';
+        chatContainer.style.display = 'none';
+      }
+    });
+
     fetchChat();
-    setInterval(fetchChat, 4000);
   </script>
 </body>
 </html>
